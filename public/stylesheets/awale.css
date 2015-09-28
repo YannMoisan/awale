@@ -1,0 +1,80 @@
+table, td {
+    border: 2px solid black;
+}
+td {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+.container{
+    display:table;
+    background-color:#DDDDDD;
+    border-spacing: 10px;
+}
+.table-row{  
+    display:table-row;
+    text-align: center;
+}
+.col{
+    display:table-cell;
+    border: 2px solid #000;
+    border-radius: 50%;
+    background-color:#FFFFFF;
+    width: 100px;
+    height: 100px;
+    vertical-align: middle;
+    font-size: 22px;
+    transition: background-color 1s ease;
+}
+/* must be after col for CSS precedence */
+.over {
+    border: 2px solid red;
+}
+.inactive {
+    background-color: #CCCCCC
+}
+.sowing {
+    -moz-animation-name: sowing-glow;
+    -moz-animation-duration: .5s;
+    -moz-animation-iteration-count: 2;
+    -moz-animation-timing-function: linear;
+    -moz-animation-direction: alternate;
+
+    -webkit-animation-name: sowing-glow;
+    -webkit-animation-duration: .5s;
+    -webkit-animation-iteration-count: 2;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-direction: alternate;
+}
+
+@-moz-keyframes sowing-glow {
+    from { box-shadow: 0 0 0px #333; }
+    to   { box-shadow: 0 0 20px #046; }
+}
+@-webkit-keyframes sowing-glow {
+    from { -webkit-box-shadow: 0 0 0px #333; }
+    to   { -webkit-box-shadow: 0 0 20px #046; }
+}
+
+.capturing {
+    -moz-animation-name: capturing-glow;
+    -moz-animation-duration: .5s;
+    -moz-animation-iteration-count: 2;
+    -moz-animation-timing-function: linear;
+    -moz-animation-direction: alternate;
+
+    -webkit-animation-name: capturing-glow;
+    -webkit-animation-duration: .5s;
+    -webkit-animation-iteration-count: 2;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-direction: alternate;
+}
+
+@-moz-keyframes capturing-glow {
+    from { box-shadow: 0 0 0px #333; }
+    to   { box-shadow: 0 0 20px #F00; }
+}
+@-webkit-keyframes capturing-glow {
+    from { -webkit-box-shadow: 0 0 0px #333; }
+    to   { -webkit-box-shadow: 0 0 20px #F00; }
+}

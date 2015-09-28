@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="@routes.Assets.at("javascripts/awale.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/Game.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/awale-ws.js")" type="text/javascript"></script>
+    <title>Awale</title>
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/awale.css")">
+  </head>
+  <body>
+    <h2>Awale</h2>
+    <p>Nb players: <span id="nb-players"></span></p>
+    <p>Nb games: <span id="nb-games"></span></p>
+
+    <button id="click" onClick="doSend('create')">Play with a friend</button>
+
+    <div id="join">
+      <p>
+        To invite someone to play, give this URL :
+        <textarea id="join-url">Hello I'm some text</textarea> <button class="copy-url">Copy URL</button>
+      </p>
+    </div>
+
+    <p><a href="http://en.wikipedia.org/wiki/Oware#Rules">Rules</a></p>
+    <div id="game">
+      <p>Opponent score : <span id="score1"></span></p>
+      <div id="container" class="container">
+        <div class="table-row">
+          <div id="11" class="col">4</div>
+          <div id="10" class="col">4</div>
+          <div id="9" class="col">4</div>
+          <div id="8" class="col">4</div>
+          <div id="7" class="col">4</div>
+          <div id="6" class="col">4</div>
+        </div>
+        <div class="table-row">
+          <div id="0" class="col">4</div>
+          <div id="1" class="col">4</div>
+          <div id="2" class="col">4</div>
+          <div id="3" class="col">4</div>
+          <div id="4" class="col">4</div>
+          <div id="5" class="col">4</div>
+        </div>
+      </div>
+      <p>Your score : <span id="score0"></span></p>
+      <p id="message"></p>
+      <div id="active">
+        <p>Your turn</p>
+      </div>
+      <div id="passive">
+        <p>Waiting for opponent</p>
+      </div>
+    </div>
+
+  </body>
+
+</html>
