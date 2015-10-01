@@ -1,9 +1,11 @@
 package controllers
 
 import akka.actor._
+import akka.event.LoggingReceive
 import play.api.libs.concurrent._
 import play.api.mvc._
 import play.api.Play.current
+import akka.actor.ActorLogging
 
 object MyController extends Controller {
   lazy val supervisor = Akka.system.actorOf(Props[SupervisorActor])
@@ -25,17 +27,16 @@ class ReceiverActor(out: ActorRef, supervisor: ActorRef) extends Actor {
   var playerId = Random.nextId
 
   // communicate with browsers in raw text
-  def receive = {
+  def receive = LoggingReceive ({
     case msg: String if msg == "create" =>
       supervisor ! Create(Player(self, out, playerId))
 
     case msg: String if msg.startsWith("connect") =>
       supervisor ! Register(Player(self, out, playerId))
-      //supervisor ! Broadcast(s"New player $playerId : $msg")
 
     case msg: String if msg.startsWith("join") =>
+      supervisor ! Register(Player(self, out, playerId))
       supervisor ! Join(Player(self, out, playerId), msg.substring(5))
-    //supervisor ! Broadcast(s"New player $playerId : $msg")
 
     case msg: String if msg.startsWith("move") =>
       // TODO : do not register at each message
@@ -43,82 +44,63 @@ class ReceiverActor(out: ActorRef, supervisor: ActorRef) extends Actor {
       val Array(_, gameId, sowId) = msg.split(':')
 
       supervisor ! Move(gameId, playerId, sowId)
-  }
+  })
 
   override def postStop() = {
     supervisor ! Close(playerId)
   }
 }
 
-class SupervisorActor extends Actor {
-  var members2 : scala.collection.mutable.ArrayBuffer[Player] = scala.collection.mutable.ArrayBuffer()
-  var members : scala.collection.mutable.Map[String, Game] = scala.collection.mutable.Map()
-  def nbPlayers = allPlayers.size + members2.size
-  def nbGames = members.size
+class SupervisorActor extends Actor with ActorLogging {
+  var members : scala.collection.mutable.ArrayBuffer[Player] = scala.collection.mutable.ArrayBuffer()
+  var games : scala.collection.mutable.Map[String, Game] = scala.collection.mutable.Map()
+  def nbPlayers = members.size
+  def nbGames = games.map{ case(_, Game(_, p1, p2, _)) => if (p2.isDefined) 1 else 0}.sum
 
-  def allPlayers = members2 ++ members.flatMap {
-    case (_, Game(_, p1, maybeP2, _)) => maybeP2 match {
-      case Some(p2) => Seq(p1, p2)
-      case None => Seq(p1)
-    }
-  }
-
-  def receive = {
+  def receive = LoggingReceive {
     case Close(playerId) => {
-      val maybeGame = members.find(p => p._2.player1.playerId == playerId || p._2.player2.map(_.playerId) == Some(playerId))
+      val maybeGame = games.find(p => p._2.player1.playerId == playerId || p._2.player2.map(_.playerId) == Some(playerId))
       maybeGame match {
         case Some((_, Game(_, p1, p2, _))) if p1.playerId == playerId => p2.get.out ! "close"
         case Some((_, Game(_, p1, p2, _))) => p1.out ! "close"
         case None =>
       }
-      allPlayers.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
+      members.find(p => p.playerId == playerId).foreach(p=>members.-=(p))
+      members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
     }
 
     case Register(player) => {
-      println("REgister:"+player.playerId)
-      members2.+=(player)
-      allPlayers.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
+      log.debug("Register:{}", player.playerId)
+      members.+=(player)
+      members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
     }
 
     case Join(member, gameId) => {
-      println(s"Join '$gameId'")
-      val currentGame = members(gameId)
+      val currentGame = games(gameId)
       val updatedGame = currentGame.join(member)
-      members.put(gameId, updatedGame)
+      games.put(gameId, updatedGame)
       updatedGame.player1.out ! ("join1")
       updatedGame.player1.out ! (s"active")
       updatedGame.player2.get.out ! ("join2")
       updatedGame.player2.get.out ! (s"passive")
 
-      allPlayers.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
+      members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
 
-//      if (members.length == 1) {
-//        members(0)._2 ! (s"gamejoin")
-//      }
-//      members = member :: members
     }
 
     case Create(member) => {
       val gameId = Random.nextId
-      println(s"Create '$gameId'")
-      members.put(gameId, Game(gameId, member, None, 1))
+      games.put(gameId, Game(gameId, member, None, 1))
       member.out ! (s"Game:${gameId}")
 
-      allPlayers.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
-
-      //members = member :: members
-      //members.foreach { _._2 ! (s"Register a new player:${members.length}") }
+      members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
     }
 
     case Move(gameId, playerId, sowId) => {
-      val updatedGame = members(gameId).move(sowId)
-      members.put(gameId, updatedGame)
+      val updatedGame = games(gameId).move(sowId)
+      games.put(gameId, updatedGame)
       updatedGame.player1.out ! (if (updatedGame.currentPlayer == 1) "active"+sowId else "passive")
       updatedGame.player2.get.out ! (if (updatedGame.currentPlayer == 2) "active"+sowId else "passive")
-
-      //members(gameId).player2.get.out ! (s"$gameId-$playerId-$sowId")
-      //count = count + 1
-      //currentPlayer = (currentPlayer + 1) % 2
     }
   }
 }
