@@ -13,7 +13,7 @@ function refresh() {
     houses.forEach(function(i) {i.classList.remove("over");});//fix style issue
     //houses.forEach(function(element) {element.innerHTML=board[+element.id];});
     houses.forEach(function(element) {
-        if (game.winner() != undefined) {
+        if (game.winner() !== undefined) {
             element.classList.add("inactive");
             document.getElementById("active").style.display = 'none';
             document.getElementById("passive").style.display = 'none';
@@ -30,7 +30,7 @@ function refresh() {
     document.getElementById("score0").innerHTML = game.scores[0];
     document.getElementById("score1").innerHTML = game.scores[1];
 
-    if (game.winner() == undefined) {
+    if (game.winner() === undefined) {
         if (game.noMoveLetOpponentPlay()) {
             console.log("noMoveLetOpponentPlay");
             var g = game.playNoMoveLetOpponentPlay();
@@ -43,15 +43,19 @@ function refresh() {
 
 //http://davidwalsh.name/css-animation-callback
 function animate(phase, clazz, callbackEnd) {
-    var a = game.turn[phase]
+    var a = game.turn[phase];
     animationCount = a.length;
 
+    // http://jslinterrors.com/dont-make-functions-within-a-loop/
+    /*jshint -W083 */
     for (var i = 0; i < a.length; i++) {
         (function(j) { setTimeout(function() {
             var x = a[j].house;
             houses[x].classList.add(clazz);
             houses[x].innerHTML = a[j].value;
-            transitionEvent && houses[x].addEventListener(transitionEvent, callbackEnd);
+            if (transitionEvent) {
+                houses[x].addEventListener(transitionEvent, callbackEnd);
+            }
         }, 500 * i);
         })(i);
     }
@@ -66,14 +70,14 @@ function animateEnd(event, clazz, callbackEnd, callbackFinished) {
     event.target.removeEventListener(transitionEvent, callbackEnd); //remove transitionEvent because there are two kinds of transiton on houses
     animationCount--;
 
-    if (animationCount == 0) { // all animation finished ?
+    if (animationCount === 0) { // all animation finished ?
         callbackFinished();
     }
 }
 
 function animateSowingEnd(event) {
     animateEnd(event, "sowing", animateSowingEnd, function () {
-        if (game.turn.capturing.length == 0) {
+        if (game.turn.capturing.length === 0) {
             refresh();
         } else {
             setTimeout(function() { animateCapturing(); }, 3000); // Why do i need to wait ?
@@ -84,8 +88,8 @@ function animateSowingEnd(event) {
 function animateCapturingEnd(event) {
     animateEnd(event, "capturing", animateCapturingEnd, function() { 
         refresh(); 
-        if (game.winner() != undefined) {
-            if (game.winner()== awale.playerId -1) {
+        if (game.winner() !== undefined) {
+            if (game.winner() === awale.playerId -1) {
                 document.getElementById("message").innerHTML = "You win !";
             } else {
                 document.getElementById("message").innerHTML = "You lose !";

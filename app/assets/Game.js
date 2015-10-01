@@ -25,7 +25,7 @@ Game.prototype = {
               ret = false;
           }
         }
-        if (ret) {console.log("No move let the opponent play")}
+        if (ret) {console.log("No move let the opponent play");}
         return ret;
     },
     canOpponentPlay: function(i) {
@@ -59,7 +59,7 @@ Game.prototype = {
         for (j = 1; j <= nb; j++) { 
             cur = (i + j) % 12;
             if (cur != i) {
-                newGame.update(cur, this.board[cur] + 1, "sowing");
+                newGame.update(cur, newGame.board[cur] + 1, "sowing");
             } else {
                 nb += 1; // jump over the initial house
             }
@@ -79,9 +79,9 @@ Game.prototype = {
         if (newGame.opponentsAllEmpty()) {
             console.log("grandSlam");
             // rollback
-            newGame.scores[this.curPlayer] = this.scores[this.curPlayer]
-            newGame.turn['capturing']=[]
-            newGame.board = tmp
+            newGame.scores[this.curPlayer] = this.scores[this.curPlayer];
+            newGame.turn.capturing=[];
+            newGame.board = tmp;
         }
 
         newGame.curPlayer = (this.curPlayer + 1) % 2;
@@ -106,8 +106,8 @@ Game.prototype = {
             console.log(typeof(i));
             console.log(newGame);
             console.log(newGame.board);
-            console.log("capturing "+i+ " " + newGame.board[i])
-            console.log("capturing "+i+ " " + newGame.board[i])
+            console.log("capturing "+i+ " " + newGame.board[i]);
+            console.log("capturing "+i+ " " + newGame.board[i]);
             newGame.scores[curp] += newGame.board[i];
             newGame.update(i, 0, "capturing");
         });
@@ -122,16 +122,23 @@ Game.prototype = {
         console.log(typeof i);
         this.noMoveLetOpponentPlay();
         // if there is a winner, all moves are invalid
-        return this.winner() == undefined && this.curPlayer == this.owner(i) && this.board[i] !== 0 && this.canOpponentPlay(i);
+        return this.winner() === undefined && this.curPlayer === this.owner(i) && this.board[i] !== 0 && this.canOpponentPlay(i);
     },
     winner: function() {
-        var i = this.scores.findIndex(function(e) { return e > 24; });
-        return (i != -1) ? i : undefined;
+        // need to conf babel for that, doesn't work with Jasmine test
+        // var i = this.scores.findIndex(function(e) { return e > 24; });
+        var i = -1;
+        if (this.scores[0] > 24) {
+            i=0;
+        } else if (this.scores[1] > 24) {
+            i=1;
+        }
+        return (i !== -1) ? i : undefined;
     },
     allEmpty: function(player) {
         var PLAYER_HOUSES = [ [0, 1, 2, 3, 4, 5], [6, 7, 8, 9, 10, 11]];
-        var b = this.board; /* because this.board is not accessible in the anonymous function …*/
-        return PLAYER_HOUSES[player].map(function(i) {return b[i]}).every(function(e) { return e == 0; });
+        var self = this;
+        return PLAYER_HOUSES[player].map(function(i) {return self.board[i];}).every(function(e) { return e === 0; });
     },
     opponentsAllEmpty: function() { return this.allEmpty((this.curPlayer + 1) % 2); },
 

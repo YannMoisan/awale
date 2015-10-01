@@ -26,15 +26,15 @@ function initWebSocket() {
   var websocket = new WebSocket(wsUri);
   awale.websocket = websocket;
 
-  websocket.onopen    = function (evt) { onOpen(evt) };
-  websocket.onclose   = function (evt) { onClose(evt) };
-  websocket.onmessage = function (evt) { onMessage(evt) };
-  websocket.onerror   = function (evt) { onError(evt) };
+  websocket.onopen    = function (evt) { onOpen(evt); };
+  websocket.onclose   = function (evt) { onClose(evt); };
+  websocket.onmessage = function (evt) { onMessage(evt); };
+  websocket.onerror   = function (evt) { onError(evt); };
 }
 
 function onOpen(evt) {
   writeToScreen("CONNECTED");
-  console.log(document.location.pathname);
+   console.log(document.location.pathname);
   if (document.location.pathname.startsWith("/game/")) {
     awale.gameId = document.location.pathname.substring(6);
     doSend("join:" + awale.gameId);
@@ -50,7 +50,7 @@ function onClose(evt) {
 function onMessage(evt) {
   writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
   if (evt.data.startsWith("Stats")) {
-    var arr = evt.data.split(":")
+    var arr = evt.data.split(":");
     document.getElementById("nb-players").innerHTML = arr[1];
     document.getElementById("nb-games").innerHTML = arr[2];
   }
@@ -124,11 +124,11 @@ function doSend(message) {
 
 function doMove(move) {
   var message = "move:" + awale.gameId + ":" + move;
-  doSend(message)
+  doSend(message);
 }
 
 function writeToScreen(message) {
-  console.log(message)
+  console.log(message);
 }
 
 document.addEventListener("DOMContentLoaded", init, false);
