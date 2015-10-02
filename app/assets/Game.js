@@ -1,8 +1,11 @@
 // immutable representation of a game in progress
 function Game() {
+    // Given the following board :
+    // f e d b c a <- player 1
+    // A B C D E F <- player 0
+    // It is represented by an array : board = [A, B, C, D, E, F, a, b, c, d, e, f]
     this.board= [4,4,4,4,4,4,4,4,4,4,4,4];
-    //this.board= [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0];
-    //this.board= [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1];
+
     this.curPlayer = 0;
     this.scores = [0,0];
 }
@@ -21,14 +24,13 @@ Game.prototype = {
     noMoveLetOpponentPlay: function() {
         var ret = true;
         for (var i=0; i<12; i++) {
-          if (this.curPlayer == this.owner(i) && this.canOpponentPlay(i)) {
+          if (this.curPlayer == this.owner(i) && this.canOpponentPlayAfterMove(i)) {
               ret = false;
           }
         }
-        if (ret) {console.log("No move let the opponent play");}
         return ret;
     },
-    canOpponentPlay: function(i) {
+    canOpponentPlayAfterMove: function(i) {
         if (this.opponentsAllEmpty()) {
             var newGame = this.play(i);
             return !newGame.allEmpty(newGame.curPlayer);
@@ -77,7 +79,6 @@ Game.prototype = {
         // A grand slam is capturing all of an opponent's seeds in one turn.
         // Such a move is legal, but no capture results. International competitions often follow this rule.
         if (newGame.opponentsAllEmpty()) {
-            console.log("grandSlam");
             // rollback
             newGame.scores[this.curPlayer] = this.scores[this.curPlayer];
             newGame.turn.capturing=[];
@@ -94,20 +95,12 @@ Game.prototype = {
         //var nb = this.board[i];
         //newGame.update(i, 0, "sowing");
 
-        console.log("curPlayer:"+this.curPlayer);
         var PLAYER_HOUSES = [ [0, 1, 2, 3, 4, 5], [6, 7, 8, 9, 10, 11]];
 
         var curPlayerHouses = PLAYER_HOUSES[this.curPlayer];
-        console.log("houses:"+curPlayerHouses.toString());
 
         var curp = this.curPlayer;
         curPlayerHouses.forEach(function(i) {
-            console.log(i);
-            console.log(typeof(i));
-            console.log(newGame);
-            console.log(newGame.board);
-            console.log("capturing "+i+ " " + newGame.board[i]);
-            console.log("capturing "+i+ " " + newGame.board[i]);
             newGame.scores[curp] += newGame.board[i];
             newGame.update(i, 0, "capturing");
         });
@@ -119,10 +112,9 @@ Game.prototype = {
         return ((PLAYER_HOUSES[0].indexOf(+i) == -1) ? 1 : 0);
     },
     valid: function(i) {
-        console.log(typeof i);
         this.noMoveLetOpponentPlay();
         // if there is a winner, all moves are invalid
-        return this.winner() === undefined && this.curPlayer === this.owner(i) && this.board[i] !== 0 && this.canOpponentPlay(i);
+        return this.winner() === undefined && this.curPlayer === this.owner(i) && this.board[i] !== 0 && this.canOpponentPlayAfterMove(i);
     },
     winner: function() {
         // need to conf babel for that, doesn't work with Jasmine test

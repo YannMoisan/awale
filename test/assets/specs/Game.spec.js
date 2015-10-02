@@ -1,3 +1,10 @@
+function human2board(arr) {
+  return arr[1].concat(arr[0].reverse())
+}
+function board2human(arr) {
+  return [arr.slice(6).reverse(),arr.slice(0,6)]
+}
+
 describe("A game", function() {
   it("should change player after a move", function() {
     var game = new Game();
@@ -9,28 +16,56 @@ describe("A game", function() {
 
     var newGame = game.play(0);
 
-    expect(newGame.board).toEqual([0,5,5,5,5,4,4,4,4,4,4,4]);
+    expect(board2human(newGame.board)).toEqual(
+      [[4, 4, 4, 4, 4, 4],
+       [0, 5, 5, 5, 5, 4]]);
     expect(newGame.scores).toEqual([0,0]);
-    expect(game.board).toEqual([4,4,4,4,4,4,4,4,4,4,4,4]);
+    expect(board2human(game.board)).toEqual(
+      [[4, 4, 4, 4, 4, 4],
+       [4, 4, 4, 4, 4, 4]]);
   });
 
   it("should update the board after a move with capture", function() {
     var game = new Game();
-    game.board = [0,0,0,0,0,4,1,0,1,1,0,0];
+    game.board = human2board(
+      [[0, 0, 1, 1, 0, 1],
+       [0, 0, 0, 0, 0, 4]]);
 
     var newGame = game.play(5);
 
-    expect(newGame.board).toEqual([0,0,0,0,0,0,2,1,0,0,0,0]);
+    expect(board2human(newGame.board)).toEqual(
+      [[0, 0, 0, 0, 1, 2],
+       [0, 0, 0, 0, 0, 0]]);
+
     expect(newGame.scores).toEqual([4,0]);
+  });
+
+  it("should update the board after a move with grand slam", function() {
+    var game = new Game();
+    game.board = human2board(
+      [[0, 0, 1, 1, 1, 1],
+       [4, 4, 4, 4, 4, 4]]);
+
+    var newGame = game.play(5);
+
+    expect(board2human(newGame.board)).toEqual(
+      [[0, 0, 2, 2, 2, 2],
+       [4, 4, 4, 4, 4, 0]]);
+
+    expect(newGame.scores).toEqual([0,0]);
   });
 
   it("should not capture seeds in our houses", function() {
     var game = new Game();
-    game.board = [1,1,0,0,0,0,0,0,0,0,0,0];
+    game.board = human2board(
+      [[0, 0, 0, 0, 0, 0],
+       [1, 1, 0, 0, 0, 0]]);
 
     var newGame = game.play(0);
 
-    expect(newGame.board).toEqual([0,2,0,0,0,0,0,0,0,0,0,0]);
+    expect(board2human(newGame.board)).toEqual(
+      [[0, 0, 0, 0, 0, 0],
+       [0, 2, 0, 0, 0, 0]]);
     expect(newGame.scores).toEqual([0,0]);
   });
 
@@ -68,7 +103,10 @@ describe("A game", function() {
 
   it("should determine that a move from an empty house is invalid", function() {
     var game = new Game();
-    game.board = [0,0,0,0,0,0,0,0,0,0,0,0];
+    game.board = human2board(
+      [[0, 0, 0, 0, 0, 0],
+       [0, 0, 0, 0, 0, 0]]);
+
     expect(game.valid(0)).toBe(false);
   });
 
@@ -91,19 +129,32 @@ describe("A game", function() {
     var game = new Game();
     expect(game.opponentsAllEmpty()).toBe(false);
 
-    game.board = [4,4,4,4,4,4,0,0,0,0,0,0];
+    game.board = human2board(
+      [[0, 0, 0, 0, 0, 0],
+       [4, 4, 4, 4, 4, 4]]);
+
     expect(game.opponentsAllEmpty()).toBe(true);
   });
 
   it("should let the opponent play", function() {
     var game = new Game();
-    game.board = [6,1,1,1,1,1,0,0,0,0,0,0];
-    expect(game.canOpponentPlay(0)).toBe(true);
-    expect(game.canOpponentPlay(1)).toBe(false);
-    expect(game.canOpponentPlay(2)).toBe(false);
-    expect(game.canOpponentPlay(3)).toBe(false);
-    expect(game.canOpponentPlay(4)).toBe(false);
-    expect(game.canOpponentPlay(5)).toBe(true);
+    game.board = human2board(
+      [[0, 0, 0, 0, 0, 0],
+       [6, 1, 1, 1, 1, 1]]);
+
+    expect(game.canOpponentPlayAfterMove(0)).toBe(true);
+    expect(game.canOpponentPlayAfterMove(1)).toBe(false);
+    expect(game.canOpponentPlayAfterMove(2)).toBe(false);
+    expect(game.canOpponentPlayAfterMove(3)).toBe(false);
+    expect(game.canOpponentPlayAfterMove(4)).toBe(false);
+    expect(game.canOpponentPlayAfterMove(5)).toBe(true);
+  });
+
+  it("should detect when no move let the opponent play", function() {
+    var game = new Game();
+    game.board = human2board(
+      [[0, 0, 0, 0, 0, 0],
+       [1, 1, 1, 1, 1, 0]]);
+    expect(game.noMoveLetOpponentPlay()).toBe(true);
   });
 });
-
