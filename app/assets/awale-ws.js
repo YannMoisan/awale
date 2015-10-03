@@ -1,7 +1,5 @@
-var awale = {};
-
 function init() {
-  init2();
+  awale.view.init();
   document.getElementById("game").style.display = 'none';
   document.getElementById("join").style.display = 'none';
   var copyTextareaBtn = document.querySelector('.copy-url');
@@ -58,8 +56,8 @@ function onMessage(evt) {
     var house = evt.data.substring(6);
     console.log(house);
     if (evt.data.length > 6) {
-      game = game.playWithValid(+house);
-      animateSowing();
+      awale.game = awale.game.play(+house);
+      awale.view.animateSowing();
 
     }
     document.getElementById("active").style.display = 'block';
@@ -77,7 +75,7 @@ function onMessage(evt) {
     document.getElementById("join").style.display = 'none';
   }
   if (evt.data == "join2") {
-    awale.playerId = 2;
+    awale.playerId = 1;
 
     // swap the board
     swapElements(document.getElementById("0"), document.getElementById("6"));
@@ -91,7 +89,7 @@ function onMessage(evt) {
   }
   if (evt.data.startsWith("Game:")) {
     awale.gameId = evt.data.substring(5);
-    awale.playerId = 1;
+    awale.playerId = 0;
     document.getElementById("join").style.display = 'block';
     document.getElementById("join-url").innerHTML = "http://" + document.location.host + "/game/" + awale.gameId;
   }

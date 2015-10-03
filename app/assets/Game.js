@@ -1,5 +1,7 @@
+var awale={};
+
 // immutable representation of a game in progress
-function Game() {
+awale.Game = function() {
     // Given the following board :
     // f e d b c a <- player 1
     // A B C D E F <- player 0
@@ -8,11 +10,11 @@ function Game() {
 
     this.curPlayer = 0;
     this.scores = [0,0];
-}
+};
 
-Game.prototype = {
+awale.Game.prototype = {
     clone: function() {
-        var newGame = new Game();
+        var newGame = new awale.Game();
         newGame.board = this.board.slice(0);
         newGame.scores = this.scores.slice(0);
         return newGame;
@@ -112,9 +114,12 @@ Game.prototype = {
         return ((PLAYER_HOUSES[0].indexOf(+i) == -1) ? 1 : 0);
     },
     valid: function(i) {
-        this.noMoveLetOpponentPlay();
         // if there is a winner, all moves are invalid
-        return this.winner() === undefined && this.curPlayer === this.owner(i) && this.board[i] !== 0 && this.canOpponentPlayAfterMove(i);
+        return this.winner() === undefined &&
+          this.curPlayer === awale.playerId &&
+          this.curPlayer === this.owner(i) &&
+          this.board[i] !== 0 &&
+          this.canOpponentPlayAfterMove(i);
     },
     winner: function() {
         // need to conf babel for that, doesn't work with Jasmine test

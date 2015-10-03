@@ -7,12 +7,12 @@ function board2human(arr) {
 
 describe("A game", function() {
   it("should change player after a move", function() {
-    var game = new Game();
+    var game = new awale.Game();
     expect(game.play(0).curPlayer).toBe(1);
   });
 
   it("should update the board after a move", function() {
-    var game = new Game();
+    var game = new awale.Game();
 
     var newGame = game.play(0);
 
@@ -26,7 +26,7 @@ describe("A game", function() {
   });
 
   it("should update the board after a move with capture", function() {
-    var game = new Game();
+    var game = new awale.Game();
     game.board = human2board(
       [[0, 0, 1, 1, 0, 1],
        [0, 0, 0, 0, 0, 4]]);
@@ -41,7 +41,7 @@ describe("A game", function() {
   });
 
   it("should update the board after a move with grand slam", function() {
-    var game = new Game();
+    var game = new awale.Game();
     game.board = human2board(
       [[0, 0, 1, 1, 1, 1],
        [4, 4, 4, 4, 4, 4]]);
@@ -56,7 +56,7 @@ describe("A game", function() {
   });
 
   it("should not capture seeds in our houses", function() {
-    var game = new Game();
+    var game = new awale.Game();
     game.board = human2board(
       [[0, 0, 0, 0, 0, 0],
        [1, 1, 0, 0, 0, 0]]);
@@ -70,7 +70,7 @@ describe("A game", function() {
   });
 
   it("should determine the owner of a house", function() {
-    var game = new Game();
+    var game = new awale.Game();
     expect(game.owner(0)).toBe(0);
     expect(game.owner(1)).toBe(0);
     expect(game.owner(2)).toBe(0);
@@ -86,7 +86,8 @@ describe("A game", function() {
   });
 
   it("should determine if a move is valid", function() {
-    var game = new Game();
+    var game = new awale.Game();
+    awale.playerId=0;
     expect(game.valid(0)).toBe(true);
     expect(game.valid(1)).toBe(true);
     expect(game.valid(2)).toBe(true);
@@ -102,7 +103,7 @@ describe("A game", function() {
   });
 
   it("should determine that a move from an empty house is invalid", function() {
-    var game = new Game();
+    var game = new awale.Game();
     game.board = human2board(
       [[0, 0, 0, 0, 0, 0],
        [0, 0, 0, 0, 0, 0]]);
@@ -111,12 +112,12 @@ describe("A game", function() {
   });
 
   it("should return no winner at the beggining of the game", function() {
-      var game = new Game();
+      var game = new awale.Game();
       expect(game.winner()).toBe(undefined);
   });
 
   it("should return a winner if a player has a score greater than 24", function() {
-      var game = new Game();
+      var game = new awale.Game();
 
       game.scores = [25, 0];
       expect(game.winner()).toBe(0);
@@ -126,7 +127,7 @@ describe("A game", function() {
   });
 
   it("should determine if opponent's houses are all empty", function() {
-    var game = new Game();
+    var game = new awale.Game();
     expect(game.opponentsAllEmpty()).toBe(false);
 
     game.board = human2board(
@@ -137,7 +138,7 @@ describe("A game", function() {
   });
 
   it("should let the opponent play", function() {
-    var game = new Game();
+    var game = new awale.Game();
     game.board = human2board(
       [[0, 0, 0, 0, 0, 0],
        [6, 1, 1, 1, 1, 1]]);
@@ -151,7 +152,7 @@ describe("A game", function() {
   });
 
   it("should detect when no move let the opponent play", function() {
-    var game = new Game();
+    var game = new awale.Game();
     game.board = human2board(
       [[0, 0, 0, 0, 0, 0],
        [1, 1, 1, 1, 1, 0]]);
