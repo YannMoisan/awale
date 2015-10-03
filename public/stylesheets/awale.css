@@ -1,6 +1,5 @@
-textarea {
+#join-url {
     padding: 0.5em;
-    resize: none;
 }
 body {
     background: #EEE;
@@ -57,12 +56,12 @@ td {
     height: 100px;
     vertical-align: middle;
     font-size: 22px;
-    transition: background-color 1s ease;
+    transition: background-color 0.5s ease;
 }
 /* must be after col for CSS precedence */
 .over {
     /*border: 2px solid red;*/
-    background-color:#E0D9B5;
+    background-color:#eaca99;
 }
 .inactive {
     background-color: #F0D9B5
