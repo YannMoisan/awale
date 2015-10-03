@@ -191,7 +191,7 @@ awale.view = {
                 var g = awale.game.playWithValid(+e.id);
                 if (g) { // to test that g != undefined
                     awale.game = g;
-                    doMove(+e.id);
+                    awale.ctrl.doMove(+e.id);
                     awale.view.animateSowing();
                 }
             });
