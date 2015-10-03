@@ -2,54 +2,69 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <script src="@routes.Assets.at("awale.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("Game.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("awale.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("awale-ws.js")" type="text/javascript"></script>
     <title>Awale</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
     <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/awale.css")">
   </head>
   <body>
-    <h2>Awale</h2>
-    <p><span id="nb-players"></span> players</p>
-    <p><span id="nb-games"></span> games in play</p>
-
-    <button id="click" onClick="doSend('create')">Play with a friend</button>
-
-    <div id="join">
-      <p>
-        To invite someone to play, give this URL :
-        <textarea id="join-url">Hello I'm some text</textarea> <button class="copy-url">Copy URL</button>
-      </p>
+    <div class="home-menu pure-menu pure-menu-horizontal">
+      <a href="#" class="pure-menu-heading pure-menu-link">Awale</a>
+      <ul class="pure-menu-list">
+        <li class="pure-menu-item"><a href="http://en.wikipedia.org/wiki/Oware#Rules" class="pure-menu-link">Rules</a></li>
+      </ul>
     </div>
 
-    <p><a href="http://en.wikipedia.org/wiki/Oware#Rules">Rules</a></p>
-    <div id="game">
-      <p>Opponent score : <span id="score1"></span></p>
-      <div id="container" class="container">
-        <div class="table-row">
-          <div id="11" class="col">4</div>
-          <div id="10" class="col">4</div>
-          <div id="9" class="col">4</div>
-          <div id="8" class="col">4</div>
-          <div id="7" class="col">4</div>
-          <div id="6" class="col">4</div>
+    <div class="main">
+      <div class="pure-g">
+        <div class="middle pure-u-2-5">
+          <p><span id="nb-players"></span> players</p>
+          <p><span id="nb-games"></span> games in play</p>
         </div>
-        <div class="table-row">
-          <div id="0" class="col">4</div>
-          <div id="1" class="col">4</div>
-          <div id="2" class="col">4</div>
-          <div id="3" class="col">4</div>
-          <div id="4" class="col">4</div>
-          <div id="5" class="col">4</div>
+        <div class="middle pure-u-3-5">
+          <button id="click" class="pure-button pure-button-primary" onClick="doSend('create')">Play with a friend</button>
         </div>
       </div>
-      <p>Your score : <span id="score0"></span></p>
-      <p id="message"></p>
-      <div id="active">
-        <p>Your turn</p>
+
+      <div id="join">
+        <p>
+          To invite someone to play, give this URL :
+        </p>
+        <p>
+          <textarea id="join-url">Hello I'm some text</textarea> <button class="pure-button copy-url">Copy URL</button>
+        </p>
       </div>
-      <div id="passive">
-        <p>Waiting for opponent</p>
+
+      <div id="game">
+        <p>Opponent score : <span id="score1"></span></p>
+        <div id="container" class="container">
+          <div class="table-row">
+            <div id="11" class="col">4</div>
+            <div id="10" class="col">4</div>
+            <div id="9" class="col">4</div>
+            <div id="8" class="col">4</div>
+            <div id="7" class="col">4</div>
+            <div id="6" class="col">4</div>
+          </div>
+          <div class="table-row">
+            <div id="0" class="col">4</div>
+            <div id="1" class="col">4</div>
+            <div id="2" class="col">4</div>
+            <div id="3" class="col">4</div>
+            <div id="4" class="col">4</div>
+            <div id="5" class="col">4</div>
+          </div>
+        </div>
+        <p>Your score : <span id="score0"></span></p>
+        <p id="message"></p>
+        <div id="active">
+          <p>Your turn</p>
+        </div>
+        <div id="passive">
+          <span class="message-warning">Waiting for opponent</span>
+        </div>
       </div>
     </div>
 

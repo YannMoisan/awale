@@ -1,3 +1,32 @@
+body {
+    background: #EEE;
+}
+.main {
+    padding-left: 2em;
+    padding-right: 2em;
+}
+.home-menu {
+    background: #2D3E50;
+}
+.middle {
+    vertical-align: middle;
+}
+.message-success,
+.message-error,
+.message-warning {
+    color: white;
+    border-radius: 4px;
+    padding: 0.5em 1em;
+}
+.message-success {
+    background: rgb(28, 184, 65); /* this is a green */
+}
+.message-error {
+    background: rgb(202, 60, 60); /* this is a maroon */
+}
+.message-warning {
+    background: rgb(223, 117, 20); /* this is an orange */
+}
 table, td {
     border: 2px solid black;
 }
@@ -8,8 +37,8 @@ td {
 }
 .container{
     display:table;
-    background-color:#DDDDDD;
-    border-spacing: 10px;
+    background-color:#B58863;
+    border-spacing: 15px;
 }
 .table-row{  
     display:table-row;
@@ -17,9 +46,9 @@ td {
 }
 .col{
     display:table-cell;
-    border: 2px solid #000;
+    /*border: 2px solid #000;*/
     border-radius: 50%;
-    background-color:#FFFFFF;
+    background-color:#F0D9B5;
     width: 100px;
     height: 100px;
     vertical-align: middle;
@@ -28,10 +57,11 @@ td {
 }
 /* must be after col for CSS precedence */
 .over {
-    border: 2px solid red;
+    /*border: 2px solid red;*/
+    background-color:#E0D9B5;
 }
 .inactive {
-    background-color: #CCCCCC
+    background-color: #F0D9B5
 }
 .sowing {
     -moz-animation-name: sowing-glow;
