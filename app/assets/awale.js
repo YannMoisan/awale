@@ -10,6 +10,21 @@
 
 awale.view = {
     refresh: function () {
+        if (awale.status === "begin") {
+            document.getElementById("start").style.display = 'block';
+            document.getElementById("invitation").style.display = 'none';
+            document.getElementById("game").style.display = 'none';
+        } else if (awale.status === "await") {
+            document.getElementById("start").style.display = 'none';
+            document.getElementById("invitation").style.display = 'block';
+            document.getElementById("game").style.display = 'none';
+
+            document.getElementById("join-url").value = "http://" + document.location.host + "/game/" + awale.gameId;
+        } else if (awale.status === "started") {
+            document.getElementById("start").style.display = 'none';
+            document.getElementById("invitation").style.display = 'none';
+            document.getElementById("game").style.display = 'block';
+        }
         //console.log(this);
         this.houses.forEach(function (i) {
             i.classList.remove("over");
@@ -27,6 +42,13 @@ awale.view = {
                 document.getElementById("message").innerHTML = "You lose !";
             }
         } else {
+            if (awale.game.curPlayer === awale.playerId) {
+                document.getElementById("active").style.display = 'block';
+                document.getElementById("passive").style.display = 'none';
+            } else {
+                document.getElementById("active").style.display = 'none';
+                document.getElementById("passive").style.display = 'block';
+            }
             this.houses.forEach(function (element) {
                 if (awale.game.curPlayer != awale.game.owner(+element.id)) {
                     element.classList.add("inactive");
@@ -128,8 +150,37 @@ awale.view = {
     },
     //transitionEvent: awale.view.whichTransitionEvent(),
 
+    // swap the board
+    swapBoard : function() {
+        this.swapElements(document.getElementById("0"), document.getElementById("6"));
+        this.swapElements(document.getElementById("1"), document.getElementById("7"));
+        this.swapElements(document.getElementById("2"), document.getElementById("8"));
+        this.swapElements(document.getElementById("3"), document.getElementById("9"));
+        this.swapElements(document.getElementById("4"), document.getElementById("10"));
+        this.swapElements(document.getElementById("5"), document.getElementById("11"));
+        this.swapElements(document.getElementById("score0"), document.getElementById("score1"));
+    },
+
+    // from : http://stackoverflow.com/questions/10716986/swap-2-html-elements-and-preserve-event-listeners-on-them
+    swapElements: function(obj1, obj2) {
+        // create marker element and insert it where obj1 is
+        var temp = document.createElement("div");
+        obj1.parentNode.insertBefore(temp, obj1);
+
+        // move obj1 to right before obj2
+        obj2.parentNode.insertBefore(obj1, obj2);
+
+        // move obj2 to right before where obj1 used to be
+        temp.parentNode.insertBefore(obj2, temp);
+
+        // remove temporary marker node
+        temp.parentNode.removeChild(temp);
+    },
+
+    // intialize the view : register event handler, …
     init: function () {
         awale.game = new awale.Game();
+        awale.status = "begin"; // begin, await, started
 
         this.houses = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(function (i) {
             return document.getElementById(i);
@@ -155,6 +206,23 @@ awale.view = {
         this.houses.forEach(function (element) {
             element.innerHTML = awale.game.board[+element.id];
         });
+
+        // #invite
+        var copyTextareaBtn = document.querySelector('.copy-url');
+
+        copyTextareaBtn.addEventListener('click', function(event) {
+            var copyTextarea = document.querySelector('#join-url');
+            copyTextarea.select();
+
+            try {
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'successful' : 'unsuccessful';
+                console.log('Copying text command was ' + msg);
+            } catch (err) {
+                console.log('Oops, unable to copy');
+            }
+        });
+
 
         this.refresh();
 
