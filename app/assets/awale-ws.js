@@ -6,26 +6,24 @@ awale.init = function() {
 awale.ctrl = {
   init: function () {
     var wsUri = "ws://" + document.location.host + "/ws";
-    var websocket = new WebSocket(wsUri);
-    awale.websocket = websocket;
+    this.websocket = new WebSocket(wsUri);
 
     var self = this;
-    websocket.onopen = function (evt) {
+    this.websocket.onopen = function (evt) {
       self.onOpen(evt);
     };
-    websocket.onclose = function (evt) {
+    this.websocket.onclose = function (evt) {
       self.onClose(evt);
     };
-    websocket.onmessage = function (evt) {
+    this.websocket.onmessage = function (evt) {
       self.onMessage(evt);
     };
-    websocket.onerror = function (evt) {
+    this.websocket.onerror = function (evt) {
       self.onError(evt);
     };
   },
   onOpen: function (evt) {
-    this.debug("CONNECTED");
-    console.log(document.location.pathname);
+    console.log("CONNECTED");
     if (document.location.pathname.startsWith("/game/")) {
       awale.gameId = document.location.pathname.substring(6);
       this.doSend("join:" + awale.gameId);
@@ -34,25 +32,25 @@ awale.ctrl = {
     }
   },
   onClose: function (evt) {
-    this.debug("DISCONNECTED");
+    console.log("DISCONNECTED");
   },
   onMessage: function (evt) {
-    this.debug('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
+    console.log('RESPONSE: ' + evt.data);
     if (evt.data.startsWith("Stats")) {
       var arr = evt.data.split(":");
-      document.getElementById("nb-players").innerHTML = arr[1];
-      document.getElementById("nb-games").innerHTML = arr[2];
+      awale.metrics={nbPlayers:arr[1], nbGames:arr[2]};
+      awale.view.refresh();
     }
     if (evt.data.startsWith("active")) {
       var house = evt.data.substring(6);
-      console.log(house);
       if (evt.data.length > 6) {
         awale.game = awale.game.play(+house);
         awale.view.animateSowing();
       }
     }
     if (evt.data == "close") {
-      document.getElementById("message").innerHTML = 'Opponent disconnected';
+      awale.status = "disconnected";
+      awale.view.refresh();
     }
     if (evt.data == "passive") {
     }
@@ -74,18 +72,15 @@ awale.ctrl = {
     }
   },
   onError: function (evt) {
-    this.debug('ERROR: ' + evt.data);
+    console.log('ERROR: ' + evt.data);
   },
   doSend: function(message) {
-    this.debug("SENT: " + message);
-    awale.websocket.send(message);
+    console.log("SENT: " + message);
+    this.websocket.send(message);
   },
   doMove: function(move) {
     var message = "move:" + awale.gameId + ":" + move;
     this.doSend(message);
-  },
-  debug: function(message) {
-    console.log(message);
   }
 };
 

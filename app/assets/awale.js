@@ -14,16 +14,26 @@ awale.view = {
             document.getElementById("start").style.display = 'block';
             document.getElementById("invitation").style.display = 'none';
             document.getElementById("game").style.display = 'none';
+            document.getElementById("disconnected").style.display = 'none';
+
+            if (awale.metrics) {
+                document.getElementById("nb-players").innerHTML = awale.metrics.nbPlayers;
+                document.getElementById("nb-games").innerHTML = awale.metrics.nbGames;
+            }
         } else if (awale.status === "await") {
             document.getElementById("start").style.display = 'none';
             document.getElementById("invitation").style.display = 'block';
             document.getElementById("game").style.display = 'none';
+            document.getElementById("disconnected").style.display = 'none';
 
             document.getElementById("join-url").value = "http://" + document.location.host + "/game/" + awale.gameId;
         } else if (awale.status === "started") {
             document.getElementById("start").style.display = 'none';
             document.getElementById("invitation").style.display = 'none';
             document.getElementById("game").style.display = 'block';
+            document.getElementById("disconnected").style.display = 'none';
+        } else if (awale.status === "disconnected") {
+            document.getElementById("disconnected").style.display = 'block';
         }
         //console.log(this);
         this.houses.forEach(function (i) {
