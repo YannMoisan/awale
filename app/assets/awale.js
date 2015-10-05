@@ -129,7 +129,7 @@ awale.view = {
                 awale.view.refresh();
             } else {
                 setTimeout(function () {
-                    this.animateCapturing();
+                    awale.view.animateCapturing();
                 }, 3000); // Why do i need to wait ?
             }
         });
@@ -137,7 +137,7 @@ awale.view = {
 
     animateCapturingEnd: function (event) {
         awale.view.animateEnd(event, "capturing", awale.view.animateCapturingEnd, function () {
-            refresh();
+            awale.view.refresh();
         });
     },
 
