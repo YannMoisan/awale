@@ -3,6 +3,8 @@ Awale
 
 [![Build Status](https://travis-ci.org/YannMoisan/awale-server.svg?branch=master)](https://travis-ci.org/YannMoisan/awale-server)
 
+[![Sauce Test Status](https://saucelabs.com/buildstatus/yamo93)](https://saucelabs.com/u/yamo93)
+
 This file will be packaged with your application, when using `activator dist`.
 
 ## How to run
