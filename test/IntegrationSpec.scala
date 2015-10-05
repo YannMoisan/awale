@@ -45,6 +45,7 @@ trait EnvAwareDriver {
       caps.setCapability("platform", "Windows 7")
       caps.setCapability("version", "38.0")
       caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
+      caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
       new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
     }
   }
