@@ -26,4 +26,4 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "org.webjars" % "jasmine" % "2.2.0"
 
-libraryDependencies += "org.seleniumhq.selenium" % "selenium-java" % "2.44.0" // % test
+libraryDependencies += "org.seleniumhq.selenium" % "selenium-java" % "2.46.0" // % test
