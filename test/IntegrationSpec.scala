@@ -14,11 +14,19 @@ class IntegrationSpec extends Specification {
 
   "Application" should {
 
-    "work from within a browser" in new WithBrowser {
+    "work from within a browser" in new WithBrowser(WebDriverFactory(FIREFOX)) {
 
       browser.goTo("http://localhost:" + port)
 
-      browser.pageSource must contain("Your new application is ready.")
+      browser.pageSource must contain("Awale")
+
+      browser.click("#click")
+
+      browser.pageSource must contain("To invite")
+
+      println(browser.$("#join-url").getValue)
+
+      //[error] Caused by com.gargoylesoftware.htmlunit.ScriptException: TypeError: Cannot find function addEventListener in object [object HTMLDocument]. (http://localhost:19001/assets/awale-ws.js#134)
     }
   }
 }
