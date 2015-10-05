@@ -5,11 +5,7 @@ scala:
 
 script: sbt ++$TRAVIS_SCALA_VERSION test
 
-before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-
-#addons:
-#  sauce_connect:
-#    username: yamo93
-#    access_key: c1783a7f-802a-41b5-af11-6c6d1841851e
+addons:
+  sauce_connect:
+    username: yamo93
+    access_key: c1783a7f-802a-41b5-af11-6c6d1841851e

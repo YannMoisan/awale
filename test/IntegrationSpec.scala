@@ -1,3 +1,7 @@
+import java.net.URL
+
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
@@ -14,7 +18,8 @@ class IntegrationSpec extends Specification {
 
   "Application" should {
 
-    "work from within a browser" in new WithBrowser(WebDriverFactory(FIREFOX)) {
+    //"work from within a browser" in new WithBrowser(WebDriverFactory(FIREFOX)) {
+      "work from within a browser" in new WithBrowser(CustomFactory()) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -27,6 +32,21 @@ class IntegrationSpec extends Specification {
       println(browser.$("#join-url").getValue)
 
       //[error] Caused by com.gargoylesoftware.htmlunit.ScriptException: TypeError: Cannot find function addEventListener in object [object HTMLDocument]. (http://localhost:19001/assets/awale-ws.js#134)
+    }
+  }
+}
+
+object CustomFactory {
+  def apply(): WebDriver = {
+    if (System.getenv("CI") != "true") {
+      println("local, use Firefox")
+      WebDriverFactory(FIREFOX)
+    } else {
+      println("remote, use remote driver")
+      val caps = DesiredCapabilities.firefox()
+      caps.setCapability("platform", "Windows 7")
+      caps.setCapability("version", "38.0")
+      new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
     }
   }
 }
