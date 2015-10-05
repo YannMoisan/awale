@@ -14,12 +14,12 @@ import play.api.test.Helpers._
  * An integration test will fire up a whole play application in a real (or headless) browser
  */
 @RunWith(classOf[JUnitRunner])
-class IntegrationSpec extends Specification {
+class IntegrationSpec extends Specification with EnvAwareDriver {
 
   "Application" should {
 
     //"work from within a browser" in new WithBrowser(WebDriverFactory(FIREFOX)) {
-      "work from within a browser" in new WithBrowser(CustomFactory()) {
+      "work from within a browser" in new WithBrowser(driver()) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -36,13 +36,11 @@ class IntegrationSpec extends Specification {
   }
 }
 
-object CustomFactory {
-  def apply(): WebDriver = {
+trait EnvAwareDriver {
+  def driver(): WebDriver = {
     if (System.getenv("CI") != "true") {
-      println("local, use Firefox")
       WebDriverFactory(FIREFOX)
     } else {
-      println("remote, use remote driver")
       val caps = DesiredCapabilities.firefox()
       caps.setCapability("platform", "Windows 7")
       caps.setCapability("version", "38.0")
