@@ -19,7 +19,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
   "Application" should {
 
     //"work from within a browser" in new WithBrowser(WebDriverFactory(FIREFOX)) {
-      "work from within a browser" in new WithBrowser(driver()) {
+      "allow one user to create a game, and another to join the game" in new WithBrowser(driver()) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -29,9 +29,22 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       browser.pageSource must contain("To invite")
 
-      println(browser.$("#join-url").getValue)
+      browser.findFirst("#invitation").isDisplayed must equalTo(true)
+      browser.findFirst("#game").isDisplayed must equalTo(false)
 
-      //[error] Caused by com.gargoylesoftware.htmlunit.ScriptException: TypeError: Cannot find function addEventListener in object [object HTMLDocument]. (http://localhost:19001/assets/awale-ws.js#134)
+      val joinUrl = browser.$("#join-url").getValue
+
+      val browser2 = new IsolatedTest()
+
+      browser2.goTo(joinUrl)
+
+      browser.findFirst("#game").isDisplayed must equalTo(true)
+      browser.findFirst("#active").isDisplayed must equalTo(true)
+      browser.findFirst("#passive").isDisplayed must equalTo(false)
+
+      browser2.findFirst("#game").isDisplayed must equalTo(true)
+      browser2.findFirst("#active").isDisplayed must equalTo(false)
+      browser2.findFirst("#passive").isDisplayed must equalTo(true)
     }
   }
 }
