@@ -37,6 +37,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
 
+      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
       browser.findFirst("#game").isDisplayed must equalTo(false)
 
@@ -62,6 +63,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       val browser2 = new TestBrowser(driver(), None)
       browser2.goTo(joinUrl)
+      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser2.findFirst("#invitation").isDisplayed must equalTo(false)
       browser2.findFirst("#game").isDisplayed must equalTo(true)
 
@@ -83,6 +85,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
 
+      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
       browser.findFirst("#game").isDisplayed must equalTo(false)
 
