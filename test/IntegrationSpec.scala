@@ -1,13 +1,20 @@
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
+import akka.actor.Props
+import controllers.{SupervisorActor, MyController}
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
+import play.api.libs.concurrent.Akka
+import play.api.{GlobalSettings, Application}
 
 import play.api.test._
 import play.api.test.Helpers._
+
+import scala.collection.JavaConversions._
 
 /**
  * add your integration spec here.
@@ -18,8 +25,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
   "Application" should {
 
-    //"work from within a browser" in new WithBrowser(WebDriverFactory(FIREFOX)) {
-      "allow one user to create a game, and another to join the game" in new WithBrowser(driver()) {
+    "allow one user to create a game" in new WithBrowser(driver()) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -29,67 +35,75 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       browser.pageSource must contain("To invite")
 
-      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+      //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+
+      browser.findFirst("#invitation").isDisplayed must equalTo(true)
+      browser.findFirst("#game").isDisplayed must equalTo(false)
+
+
+    }
+
+    "allow one user to create a game, and another user to join" in new WithBrowser(driver()) {
+
+      browser.goTo("http://localhost:" + port)
+
+      browser.pageSource must contain("Awale")
+
+      browser.click("#click")
+
+      browser.pageSource must contain("To invite")
+
+      //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
       browser.findFirst("#game").isDisplayed must equalTo(false)
 
       val joinUrl = browser.$("#join-url").getValue
 
-//      val browser2 = new IsolatedTest()
-//
-//      browser2.goTo(joinUrl)
-//
-//      browser.findFirst("#game").isDisplayed must equalTo(true)
-//      browser.findFirst("#active").isDisplayed must equalTo(true)
-//      browser.findFirst("#passive").isDisplayed must equalTo(false)
-//
-//      browser2.findFirst("#game").isDisplayed must equalTo(true)
-//      browser2.findFirst("#active").isDisplayed must equalTo(false)
-//      browser2.findFirst("#passive").isDisplayed must equalTo(true)
+      val browser2 = new TestBrowser(driver(), None)
+      browser2.goTo(joinUrl)
+      browser2.findFirst("#invitation").isDisplayed must equalTo(false)
+      browser2.findFirst("#game").isDisplayed must equalTo(true)
 
+      browser.findFirst("#invitation").isDisplayed must equalTo(false)
+      browser.findFirst("#game").isDisplayed must equalTo(true)
 
-//        browser.click("#0")
-//        browser.findFirst("#1").getText must equalTo(5)
-//
-//        browser.quit()
-//        browser2.quit()
+      browser2.quit()
     }
 
-//    "allow player 1 to play the first turn" in new WithBrowser(driver()) {
-//
-//      browser.goTo("http://localhost:" + port)
-//
-//      browser.pageSource must contain("Awale")
-//
-//      browser.click("#click")
-//
-//      browser.pageSource must contain("To invite")
-//      browser.takeScreenShot()
-//
-//      browser.findFirst("#invitation").isDisplayed must equalTo(true)
-//      browser.findFirst("#game").isDisplayed must equalTo(false)
-//
-//      val joinUrl = browser.$("#join-url").getValue
-//
-//      val browser2 = new IsolatedTest()
-//
-//      browser2.goTo(joinUrl)
-//
-//      browser.findFirst("#game").isDisplayed must equalTo(true)
-//      browser.findFirst("#active").isDisplayed must equalTo(true)
-//      browser.findFirst("#passive").isDisplayed must equalTo(false)
-//
-//      browser2.findFirst("#game").isDisplayed must equalTo(true)
-//      browser2.findFirst("#active").isDisplayed must equalTo(false)
-//      browser2.findFirst("#passive").isDisplayed must equalTo(true)
-//
-//      browser.click("#0")
-//      browser.findFirst("#1").getText must equalTo(5)
-//
-//      browser.quit()
-//      browser2.quit()
-//
-//    }
+    "allow one user to create a game, and another user to join, and the first one to play the first move" in new WithBrowser(driver()) {
+
+      browser.goTo("http://localhost:" + port)
+
+      browser.pageSource must contain("Awale")
+
+      browser.click("#click")
+
+      browser.pageSource must contain("To invite")
+
+      //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+
+      browser.findFirst("#invitation").isDisplayed must equalTo(true)
+      browser.findFirst("#game").isDisplayed must equalTo(false)
+
+      val joinUrl = browser.$("#join-url").getValue
+
+      val browser2 = new TestBrowser(driver(), None)
+      browser2.goTo(joinUrl)
+      browser2.findFirst("#invitation").isDisplayed must equalTo(false)
+      browser2.findFirst("#game").isDisplayed must equalTo(true)
+
+      browser.findFirst("#invitation").isDisplayed must equalTo(false)
+      browser.findFirst("#game").isDisplayed must equalTo(true)
+
+      browser.find(".col").get(6).click()
+      browser.await().atMost(5, TimeUnit.SECONDS).until("#passive").areDisplayed()
+      browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
+
+      browser2.quit()
+    }
+
+
   }
 }
 
