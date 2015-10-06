@@ -1,6 +1,5 @@
 import java.net.URL
 
-import org.fluentlenium.adapter.IsolatedTest
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.specs2.mutable._
