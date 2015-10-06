@@ -5,7 +5,9 @@ jdk:
   - oraclejdk8
 
 
-script: sbt ++$TRAVIS_SCALA_VERSION test
+script:
+- cd $TRAVIS_BUILD_DIR
+- sbt ++$TRAVIS_SCALA_VERSION test
 
 #  encrypted SAUCE_USERNAME and SAUCE_ACCESS_KEY
 env:
