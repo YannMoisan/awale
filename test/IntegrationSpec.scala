@@ -1,5 +1,6 @@
 import java.net.URL
 
+import org.fluentlenium.adapter.IsolatedTest
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.specs2.mutable._
@@ -34,18 +35,61 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       val joinUrl = browser.$("#join-url").getValue
 
-      val browser2 = new IsolatedTest()
+//      val browser2 = new IsolatedTest()
+//
+//      browser2.goTo(joinUrl)
+//
+//      browser.findFirst("#game").isDisplayed must equalTo(true)
+//      browser.findFirst("#active").isDisplayed must equalTo(true)
+//      browser.findFirst("#passive").isDisplayed must equalTo(false)
+//
+//      browser2.findFirst("#game").isDisplayed must equalTo(true)
+//      browser2.findFirst("#active").isDisplayed must equalTo(false)
+//      browser2.findFirst("#passive").isDisplayed must equalTo(true)
 
-      browser2.goTo(joinUrl)
 
-      browser.findFirst("#game").isDisplayed must equalTo(true)
-      browser.findFirst("#active").isDisplayed must equalTo(true)
-      browser.findFirst("#passive").isDisplayed must equalTo(false)
-
-      browser2.findFirst("#game").isDisplayed must equalTo(true)
-      browser2.findFirst("#active").isDisplayed must equalTo(false)
-      browser2.findFirst("#passive").isDisplayed must equalTo(true)
+//        browser.click("#0")
+//        browser.findFirst("#1").getText must equalTo(5)
+//
+//        browser.quit()
+//        browser2.quit()
     }
+
+//    "allow player 1 to play the first turn" in new WithBrowser(driver()) {
+//
+//      browser.goTo("http://localhost:" + port)
+//
+//      browser.pageSource must contain("Awale")
+//
+//      browser.click("#click")
+//
+//      browser.pageSource must contain("To invite")
+//      browser.takeScreenShot()
+//
+//      browser.findFirst("#invitation").isDisplayed must equalTo(true)
+//      browser.findFirst("#game").isDisplayed must equalTo(false)
+//
+//      val joinUrl = browser.$("#join-url").getValue
+//
+//      val browser2 = new IsolatedTest()
+//
+//      browser2.goTo(joinUrl)
+//
+//      browser.findFirst("#game").isDisplayed must equalTo(true)
+//      browser.findFirst("#active").isDisplayed must equalTo(true)
+//      browser.findFirst("#passive").isDisplayed must equalTo(false)
+//
+//      browser2.findFirst("#game").isDisplayed must equalTo(true)
+//      browser2.findFirst("#active").isDisplayed must equalTo(false)
+//      browser2.findFirst("#passive").isDisplayed must equalTo(true)
+//
+//      browser.click("#0")
+//      browser.findFirst("#1").getText must equalTo(5)
+//
+//      browser.quit()
+//      browser2.quit()
+//
+//    }
   }
 }
 
