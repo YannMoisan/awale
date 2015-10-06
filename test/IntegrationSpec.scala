@@ -29,6 +29,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       browser.pageSource must contain("To invite")
 
+      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
       browser.findFirst("#game").isDisplayed must equalTo(false)
 
