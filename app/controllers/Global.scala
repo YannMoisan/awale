@@ -10,7 +10,7 @@ object Global extends GlobalSettings {
   var supervisor : ActorRef = null;
 
   override def onStart(app: Application) {
-    supervisor = Akka.system.actorOf(Props[SupervisorActor])
+    Akka.system.actorOf(Props[SupervisorActor], "supervisor")
 
   }
 

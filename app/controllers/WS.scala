@@ -14,12 +14,12 @@ object MyController extends Controller {
   //var supervisor = Akka.system.actorOf(Props[SupervisorActor])
 
   def socket = WebSocket.acceptWithActor[String, String] { request => out =>
-    ReceiverActor.props(out, Global.supervisor)
+    ReceiverActor.props(out)
   }
 }
 
 object ReceiverActor {
-  def props(out: ActorRef, supervisor: ActorRef) = Props(new ReceiverActor(out, supervisor))
+  def props(out: ActorRef) = Props(new ReceiverActor(out))
 }
 
 object Random {
@@ -28,8 +28,9 @@ object Random {
     id}
 }
 
-class ReceiverActor(out: ActorRef, supervisor: ActorRef) extends Actor {
+class ReceiverActor(out: ActorRef) extends Actor {
   var playerId = Random.nextId
+  val supervisor = context.actorSelection("/user/supervisor")
 
   // communicate with browsers in raw text
   def receive = LoggingReceive ({
