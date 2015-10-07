@@ -61,16 +61,18 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       val joinUrl = browser.$("#join-url").getValue
 
-      val browser2 = new TestBrowser(driver(), None)
-      browser2.goTo(joinUrl)
-      //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
-      browser2.findFirst("#invitation").isDisplayed must equalTo(false)
-      browser2.findFirst("#game").isDisplayed must equalTo(true)
+      browser.executeScript(s"window.open('${joinUrl}', '_blank');")
+
+      var tabs2 = webDriver.getWindowHandles()
+      webDriver.switchTo().window(tabs2.toList(1));
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
       browser.findFirst("#game").isDisplayed must equalTo(true)
 
-      browser2.quit()
+      webDriver.switchTo().window(tabs2.toList(0));
+
+      browser.findFirst("#invitation").isDisplayed must equalTo(false)
+      browser.findFirst("#game").isDisplayed must equalTo(true)
     }
 
     "allow one user to create a game, and another user to join, and the first one to play the first move" in new WithBrowser(driver()) {
@@ -91,10 +93,15 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       val joinUrl = browser.$("#join-url").getValue
 
-      val browser2 = new TestBrowser(driver(), None)
-      browser2.goTo(joinUrl)
-      browser2.findFirst("#invitation").isDisplayed must equalTo(false)
-      browser2.findFirst("#game").isDisplayed must equalTo(true)
+      browser.executeScript(s"window.open('${joinUrl}', '_blank');")
+      var tabs2 = webDriver.getWindowHandles()
+      println(tabs2.mkString(","))
+      webDriver.switchTo().window(tabs2.toList(1));
+
+      browser.findFirst("#invitation").isDisplayed must equalTo(false)
+      browser.findFirst("#game").isDisplayed must equalTo(true)
+
+      webDriver.switchTo().window(tabs2.toList(0));
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
       browser.findFirst("#game").isDisplayed must equalTo(true)
@@ -102,8 +109,6 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.find(".col").get(6).click()
       browser.await().atMost(5, TimeUnit.SECONDS).until("#passive").areDisplayed()
       browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
-
-      browser2.quit()
     }
 
 
