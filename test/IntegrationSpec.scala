@@ -54,7 +54,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       browser.pageSource must contain("To invite")
 
-      //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
 
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
       browser.findFirst("#game").isDisplayed must equalTo(false)
@@ -63,7 +63,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       val browser2 = new TestBrowser(driver(), None)
       browser2.goTo(joinUrl)
-      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+      //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser2.findFirst("#invitation").isDisplayed must equalTo(false)
       browser2.findFirst("#game").isDisplayed must equalTo(true)
 
@@ -112,15 +112,16 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
 trait EnvAwareDriver {
   def driver(): WebDriver = {
-    if (System.getenv("CI") != "true") {
-      WebDriverFactory(FIREFOX)
-    } else {
-      val caps = DesiredCapabilities.firefox()
-      caps.setCapability("platform", "Windows 7")
-      caps.setCapability("version", "38.0")
-      caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
-      caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
-      new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
-    }
+    WebDriverFactory(FIREFOX)
+//    if (System.getenv("CI") != "true") {
+//      WebDriverFactory(FIREFOX)
+//    } else {
+//      val caps = DesiredCapabilities.firefox()
+//      caps.setCapability("platform", "Windows 7")
+//      caps.setCapability("version", "38.0")
+//      caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
+//      caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
+//      new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
+//    }
   }
 }
