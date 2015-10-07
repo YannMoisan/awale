@@ -34,24 +34,20 @@ class ReceiverActor(out: ActorRef) extends Actor {
 
   // communicate with browsers in raw text
   def receive = LoggingReceive ({
-    case msg: String if msg == "create" =>
-      println("create:"+playerId)
-      println(supervisor)
-      supervisor ! Create(Player(self, out, playerId))
+    case s: String => s.split(":") match {
+      case Array("create") =>
+        supervisor ! Create(Player(self, out, playerId))
 
-    case msg: String if msg.startsWith("connect") =>
-      supervisor ! Register(Player(self, out, playerId))
+      case Array("connect", _) =>
+        supervisor ! Register(Player(self, out, playerId))
 
-    case msg: String if msg.startsWith("join") =>
-      supervisor ! Register(Player(self, out, playerId))
-      supervisor ! Join(Player(self, out, playerId), msg.substring(5))
+      case Array("join", gameId) =>
+        supervisor ! Register(Player(self, out, playerId))
+        supervisor ! Join(Player(self, out, playerId), gameId)
 
-    case msg: String if msg.startsWith("move") =>
-      // TODO : do not register at each message
-      //supervisor ! Register((self, out))
-      val Array(_, gameId, sowId) = msg.split(':')
-
-      supervisor ! Move(gameId, playerId, sowId)
+      case Array("move", gameId, sowId) =>
+        supervisor ! Move(gameId, playerId, sowId)
+    }
   })
 
   override def postStop() = {
