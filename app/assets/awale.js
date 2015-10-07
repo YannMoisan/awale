@@ -35,6 +35,12 @@ awale.view = {
         } else if (awale.status === "disconnected") {
             document.getElementById("disconnected").style.display = 'block';
         }
+        if (awale.error) {
+            document.getElementById("error").style.display = 'block';
+            document.getElementById("error").innerHTML = awale.error;
+        } else {
+            document.getElementById("error").style.display = 'none';
+        }
         //console.log(this);
         this.houses.forEach(function (i) {
             i.classList.remove("over");

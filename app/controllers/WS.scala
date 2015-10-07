@@ -79,15 +79,16 @@ class SupervisorActor extends Actor with ActorLogging {
     }
 
     case Join(member, gameId) => {
-      games(gameId) match {
-        case g: PreGame =>
+      games.get(gameId) match {
+        case Some(g: PreGame) =>
           val updatedGame = g.join(member)
           games.put(gameId, updatedGame)
           updatedGame.player1.out ! ("join1")
           updatedGame.player1.out ! (s"active")
           updatedGame.player2.out ! ("join2")
           updatedGame.player2.out ! (s"passive")
-        case _: ReadyGame => // we can't join a ReadyGame
+        case Some(_: ReadyGame) => member.out ! "error:You can't join because there are already two players" // we can't join a ReadyGame
+        case None => member.out ! "error:You can't join because this game doesn't exist"
       }
 
       members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
