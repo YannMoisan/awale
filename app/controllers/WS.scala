@@ -69,13 +69,13 @@ class SupervisorActor extends Actor with ActorLogging {
       opponents.foreach { _.out! "close"}
 
       members.find(p => p.playerId == playerId).foreach(p=>members.-=(p))
-      members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
+      members.foreach(_.out ! s"stats:$nbPlayers:$nbGames")
     }
 
     case Register(player) => {
       log.debug("Register:{}", player.playerId)
       members.+=(player)
-      members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
+      members.foreach(_.out ! s"stats:$nbPlayers:$nbGames")
     }
 
     case Join(member, gameId) => {
@@ -91,15 +91,15 @@ class SupervisorActor extends Actor with ActorLogging {
         case None => member.out ! "error:You can't join because this game doesn't exist"
       }
 
-      members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
+      members.foreach(_.out ! s"stats:$nbPlayers:$nbGames")
     }
 
     case Create(member) => {
       val gameId = Random.nextId
       games.put(gameId, PreGame(gameId, member))
-      member.out ! (s"Game:${gameId}")
+      member.out ! (s"game:${gameId}")
 
-      members.foreach(_.out ! s"Stats:$nbPlayers:$nbGames")
+      members.foreach(_.out ! s"stats:$nbPlayers:$nbGames")
     }
 
     case Move(gameId, playerId, sowId) => {

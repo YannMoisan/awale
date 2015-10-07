@@ -36,38 +36,42 @@ awale.ctrl = {
   },
   onMessage: function (evt) {
     console.log('RESPONSE: ' + evt.data);
-    if (evt.data.startsWith("Stats")) {
-      var arr = evt.data.split(":");
+    var arr = evt.data.split(":");
+    if (arr[0] === "stats") {
       awale.metrics={nbPlayers:arr[1], nbGames:arr[2]};
       awale.view.refresh();
     }
-    if (evt.data.startsWith("active")) {
-      var house = evt.data.substring(6);
-      if (evt.data.length > 6) {
-        awale.game = awale.game.play(+house);
-        awale.view.animateSowing();
-      }
+    if (arr[0] === "active") {
+      awale.time={time0:+arr[2], time1:+arr[3]};
+      awale.game = awale.game.play(+arr[1]);
+      awale.view.animateSowing();
     }
-    if (evt.data == "close") {
+    if (arr[0] === "close") {
       awale.status = "disconnected";
       awale.view.refresh();
     }
-    if (evt.data == "passive") {
+    if (arr[0] === "passive") {
+      awale.time={time0:+arr[1], time1:+arr[2]};
+      //awale.view.refresh();
     }
-    if (evt.data == "join1") {
+    if (arr[0] === "join1") {
       awale.status = "started";
       awale.view.refresh();
     }
-    if (evt.data == "join2") {
+    if (arr[0] === "join2") {
       awale.playerId = 1;
       awale.status = "started";
       awale.view.swapBoard();
       awale.view.refresh();
     }
-    if (evt.data.startsWith("Game:")) {
-      awale.gameId = evt.data.substring(5);
+    if (arr[0] === "game") {
+      awale.gameId = arr[1];
       awale.playerId = 0;
       awale.status = "await";
+      awale.view.refresh();
+    }
+    if (arr[0] === "error") {
+      awale.error = arr[1];
       awale.view.refresh();
     }
   },

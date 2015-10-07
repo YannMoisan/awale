@@ -9,6 +9,11 @@
 //var transitionEvent = whichTransitionEvent();
 
 awale.view = {
+    secondsToString: function(nb) {
+      var min = Math.ceil(nb/60);
+      var sec = nb % 60;
+      return min + ":" + sec;
+    },
     refresh: function () {
         if (awale.status === "begin") {
             document.getElementById("start").style.display = 'block';
@@ -32,6 +37,11 @@ awale.view = {
             document.getElementById("invitation").style.display = 'none';
             document.getElementById("game").style.display = 'block';
             document.getElementById("disconnected").style.display = 'none';
+
+            if (awale.time) {
+                document.getElementById("time0").innerHTML = this.secondsToString(awale.time.time0);
+                document.getElementById("time1").innerHTML = this.secondsToString(awale.time.time1);
+            }
         } else if (awale.status === "disconnected") {
             document.getElementById("disconnected").style.display = 'block';
         }
@@ -61,6 +71,15 @@ awale.view = {
             if (awale.game.curPlayer === awale.playerId) {
                 document.getElementById("active").style.display = 'block';
                 document.getElementById("passive").style.display = 'none';
+                //awale.view.intervalID = window.setInterval(function() {
+                //    if (awale.game.curPlayer === 0) {
+                //        awale.time.time0 += 1;
+                //        document.getElementById("time0").innerHTML = awale.view.secondsToString(awale.time.time0);
+                //    } else {
+                //        awale.time.time0 += 1;
+                //        document.getElementById("time1").innerHTML = awale.view.secondsToString(awale.time.time0);
+                //    }
+                //}, 1000);
             } else {
                 document.getElementById("active").style.display = 'none';
                 document.getElementById("passive").style.display = 'block';
@@ -175,6 +194,7 @@ awale.view = {
         this.swapElements(document.getElementById("4"), document.getElementById("10"));
         this.swapElements(document.getElementById("5"), document.getElementById("11"));
         this.swapElements(document.getElementById("score0"), document.getElementById("score1"));
+        this.swapElements(document.getElementById("time0"), document.getElementById("time1"));
     },
 
     // from : http://stackoverflow.com/questions/10716986/swap-2-html-elements-and-preserve-event-listeners-on-them
