@@ -111,6 +111,7 @@ object FluentExtensions {
     def goToInNewTab(url: String): Fluent = {
       f.executeScript(s"window.open('${url}', '_blank');")
       val tabs = f.getDriver.getWindowHandles()
+      println(tabs.getClass.getName)
       f.getDriver.switchTo().window(tabs.toList(1))
       return f
     }
