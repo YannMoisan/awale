@@ -25,7 +25,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
   "Application" should {
 
-    "allow one user to create a game" in new WithBrowser(driver()) {
+    "allow one user to create a game" in new WithBrowser(driver("1")) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -44,7 +44,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     }
 
-    "allow one user to create a game, and another user to join" in new WithBrowser(driver()) {
+    "allow one user to create a game, and another user to join" in new WithBrowser(driver("2")) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -75,7 +75,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.findFirst("#game").isDisplayed must equalTo(true)
     }
 
-    "allow one user to create a game, and another user to join, and the first one to play the first move" in new WithBrowser(driver()) {
+    "allow one user to create a game, and another user to join, and the first one to play the first move" in new WithBrowser(driver("3")) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -116,7 +116,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 }
 
 trait EnvAwareDriver {
-  def driver(): WebDriver = {
+  def driver(name: String): WebDriver = {
     //WebDriverFactory(FIREFOX)
     if (System.getenv("CI") != "true") {
       WebDriverFactory(FIREFOX)
@@ -126,6 +126,7 @@ trait EnvAwareDriver {
       caps.setCapability("version", "38.0")
       caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
       caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
+      caps.setCapability("name", name)
       new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
     }
   }
