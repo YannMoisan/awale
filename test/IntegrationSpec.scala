@@ -25,7 +25,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
   "Application" should {
 
-    "allow one user to create a game" in new WithBrowser(driver("1")) {
+    "allow one user to create a game" in (s => new WithBrowser(driver(s)) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -40,11 +40,9 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
       browser.findFirst("#game").isDisplayed must equalTo(false)
-
-
     }
 
-    "allow one user to create a game, and another user to join" in new WithBrowser(driver("2")) {
+    "allow one user to create a game, and another user to join" in (s => new WithBrowser(driver(s)) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -73,9 +71,9 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
       browser.findFirst("#game").isDisplayed must equalTo(true)
-    }
+    })
 
-    "allow one user to create a game, and another user to join, and the first one to play the first move" in new WithBrowser(driver("3")) {
+    "allow one user to create a game, and another user to join, and the first one to play the first move" in (s => new WithBrowser(driver(s)) {
 
       browser.goTo("http://localhost:" + port)
 

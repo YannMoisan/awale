@@ -7,7 +7,7 @@ awale.ctrl = {
   init: function () {
     var wsUri = "ws://" + document.location.host + "/ws";
     try {
-      this.websocket = new WebSocket(wsUri+"/toto");
+      this.websocket = new WebSocket(wsUri);
     } catch(e) {
       console.log("Can't connect to : " + wsUri + " - " + e);
       awale.error = "Can't connect to : " + wsUri + " - " + e;
