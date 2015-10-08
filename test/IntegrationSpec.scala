@@ -3,6 +3,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.Props
 import controllers.{SupervisorActor, MyController}
+import org.fluentlenium.core.Fluent
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.specs2.mutable._
@@ -22,6 +23,7 @@ import scala.collection.JavaConversions._
  */
 @RunWith(classOf[JUnitRunner])
 class IntegrationSpec extends Specification with EnvAwareDriver {
+  import FluentExtensions._
 
   "Application" should {
 
@@ -34,8 +36,6 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.click("#click")
 
       browser.pageSource must contain("To invite")
-
-      //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
 
       browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
@@ -59,15 +59,12 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       val joinUrl = browser.$("#join-url").getValue
 
-      browser.executeScript(s"window.open('${joinUrl}', '_blank');")
-
-      var tabs2 = webDriver.getWindowHandles()
-      webDriver.switchTo().window(tabs2.toList(1));
+      browser.goToInNewTab(joinUrl)
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
       browser.findFirst("#game").isDisplayed must equalTo(true)
 
-      webDriver.switchTo().window(tabs2.toList(0));
+      browser.firstTab()
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
       browser.findFirst("#game").isDisplayed must equalTo(true)
@@ -83,26 +80,18 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       browser.pageSource must contain("To invite")
 
-      //browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
-
       browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
       browser.findFirst("#game").isDisplayed must equalTo(false)
 
       val joinUrl = browser.$("#join-url").getValue
 
-      var tabs1 = webDriver.getWindowHandles().toList
-      println("before open:"+tabs1.mkString(","))
-
-      browser.executeScript(s"window.open('${joinUrl}', '_blank');")
-      var tabs2 = webDriver.getWindowHandles().toList
-      println("after open:"+tabs2.mkString(","))
-      webDriver.switchTo().window(tabs2.toList(1));
+      browser.goToInNewTab(joinUrl)
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
       browser.findFirst("#game").isDisplayed must equalTo(true)
 
-      webDriver.switchTo().window(tabs2.toList(0));
+      browser.firstTab()
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
       browser.findFirst("#game").isDisplayed must equalTo(true)
@@ -113,6 +102,23 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
     })
 
 
+  }
+}
+
+object FluentExtensions {
+
+  implicit class EnhancedFluentAdapter(f: Fluent) {
+    def goToInNewTab(url: String): Fluent = {
+      f.executeScript(s"window.open('${url}', '_blank');")
+      val tabs = f.getDriver.getWindowHandles()
+      f.getDriver.switchTo().window(tabs.toList(1))
+      return f
+    }
+    def firstTab() : Fluent = {
+      val tabs = f.getDriver.getWindowHandles()
+      f.getDriver.switchTo().window(tabs.toList(0))
+      f
+    }
   }
 }
 
