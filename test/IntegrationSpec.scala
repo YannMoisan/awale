@@ -109,15 +109,18 @@ object FluentExtensions {
 
   implicit class EnhancedFluentAdapter(f: Fluent) {
     def goToInNewTab(url: String): Fluent = {
-      f.executeScript(s"window.open('${url}', '_blank');")
       val tabs = f.getDriver.getWindowHandles()
-      println(tabs.getClass.getName)
-      f.getDriver.switchTo().window(tabs.toList(1))
-      return f
+      f.executeScript(s"window.open('${url}', '_blank');")
+      val tabs2 = f.getDriver.getWindowHandles()
+      tabs2.removeAll(tabs)
+      f.getDriver.switchTo().window(tabs2.iterator.next)
+      f
     }
     def firstTab() : Fluent = {
+      val currentTab = f.getDriver.getWindowHandle
       val tabs = f.getDriver.getWindowHandles()
-      f.getDriver.switchTo().window(tabs.toList(0))
+      tabs.remove(currentTab)
+      f.getDriver.switchTo().window(tabs.iterator().next())
       f
     }
   }
