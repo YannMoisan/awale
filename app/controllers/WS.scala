@@ -20,9 +20,7 @@ object ReceiverActor {
 }
 
 object Random {
-  def nextId : String = { val id = scala.util.Random.alphanumeric.take(6).mkString.toLowerCase
-    println(id)
-    id}
+  def nextId : String = scala.util.Random.alphanumeric.take(6).mkString.toLowerCase
 }
 
 class ReceiverActor(out: ActorRef) extends Actor {

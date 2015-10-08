@@ -7,11 +7,8 @@ import play.libs.Akka
 
 object Global extends GlobalSettings {
 
-  var supervisor : ActorRef = null;
-
   override def onStart(app: Application) {
     Akka.system.actorOf(Props[SupervisorActor], "supervisor")
-
   }
 
   override def onStop(app: Application) {
