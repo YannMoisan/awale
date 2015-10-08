@@ -91,9 +91,12 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       val joinUrl = browser.$("#join-url").getValue
 
+      var tabs1 = webDriver.getWindowHandles().toList
+      println("before open:"+tabs2.mkString(","))
+
       browser.executeScript(s"window.open('${joinUrl}', '_blank');")
-      var tabs2 = webDriver.getWindowHandles()
-      println(tabs2.mkString(","))
+      var tabs2 = webDriver.getWindowHandles().toList
+      println("after open:"+tabs2.mkString(","))
       webDriver.switchTo().window(tabs2.toList(1));
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
