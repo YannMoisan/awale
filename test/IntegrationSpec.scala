@@ -122,7 +122,7 @@ trait EnvAwareDriver {
       WebDriverFactory(FIREFOX)
     } else {
       val caps = DesiredCapabilities.firefox()
-      caps.setCapability("platform", "Linux")
+      caps.setCapability("platform", "Windows 7")
       caps.setCapability("version", "38.0")
       caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
       caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))

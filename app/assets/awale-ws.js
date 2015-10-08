@@ -6,7 +6,13 @@ awale.init = function() {
 awale.ctrl = {
   init: function () {
     var wsUri = "ws://" + document.location.host + "/ws";
-    this.websocket = new WebSocket(wsUri);
+    try {
+      this.websocket = new WebSocket(wsUri+"/toto");
+    } catch(e) {
+      console.log("Can't connect to : " + wsUri + " - " + e);
+      awale.error = "Can't connect to : " + wsUri + " - " + e;
+      awale.view.refresh();
+    }
 
     var self = this;
     this.websocket.onopen = function (evt) {
@@ -32,6 +38,8 @@ awale.ctrl = {
     }
   },
   onClose: function (evt) {
+    awale.error = "DISCONNECTED";
+    awale.view.refresh();
     console.log("DISCONNECTED");
   },
   onMessage: function (evt) {
