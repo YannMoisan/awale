@@ -25,7 +25,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
   "Application" should {
 
-    "allow one user to create a game" in (s => new WithBrowser(driver(s)) {
+    "allow one user to create a game" in ((s: String) => new WithBrowser(driver(s)) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -40,9 +40,9 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
       browser.findFirst("#invitation").isDisplayed must equalTo(true)
       browser.findFirst("#game").isDisplayed must equalTo(false)
-    }
+    })
 
-    "allow one user to create a game, and another user to join" in (s => new WithBrowser(driver(s)) {
+    "allow one user to create a game, and another user to join" in ((s: String) => new WithBrowser(driver(s)) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -73,7 +73,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.findFirst("#game").isDisplayed must equalTo(true)
     })
 
-    "allow one user to create a game, and another user to join, and the first one to play the first move" in (s => new WithBrowser(driver(s)) {
+    "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(driver(s)) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -107,7 +107,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.find(".col").get(6).click()
       browser.await().atMost(5, TimeUnit.SECONDS).until("#passive").areDisplayed()
       browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
-    }
+    })
 
 
   }
