@@ -1,4 +1,4 @@
-name := """awale-server"""
+name := """awale"""
 
 version := "1.0-SNAPSHOT"
 

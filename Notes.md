@@ -11,7 +11,7 @@ prerequisite : java 8 on the server
 activator dist
 scp
 unzip
-./bin/awale-server
+./bin/awale
 
 activator test : js and scala
 activator jasmine : js test
@@ -84,7 +84,7 @@ object Global extends GlobalSettings {
 }
 
 * compilation issue
-[error] /home/travis/build/YannMoisan/awale-server/test/IntegrationSpec.scala:32: not found: value TimeUnit
+[error] /home/travis/build/YannMoisan/awale/test/IntegrationSpec.scala:32: not found: value TimeUnit
 
 [error]       browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
 * "#0" works in the browser but not in the test
@@ -120,4 +120,3 @@ reactive mongo 0.11.7 with play 2.3
 * http://neemzy.org/articles/deploy-to-your-own-server-through-ssh-with-travis-ci
 * https://guides.github.com/pdfs/githubflow-online.pdf
 * https://panopticlick.eff.org/
-* http://awale-server.herokuapp.com/
