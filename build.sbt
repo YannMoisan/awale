@@ -27,3 +27,5 @@ libraryDependencies ++= Seq(
 libraryDependencies += "org.webjars" % "jasmine" % "2.2.0"
 
 libraryDependencies += "org.seleniumhq.selenium" % "selenium-java" % "2.46.0" // % test
+
+libraryDependencies += "org.reactivemongo" %% "reactivemongo" % "0.10.5.0.akka23"

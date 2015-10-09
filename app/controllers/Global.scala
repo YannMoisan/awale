@@ -9,6 +9,7 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     Akka.system.actorOf(Props[SupervisorActor], "supervisor")
+    Akka.system.actorOf(Props[MongoActor], "store")
   }
 
   override def onStop(app: Application) {
