@@ -16,7 +16,7 @@ env:
 addons:
   sauce_connect:
   #true
-    no_ssl_bump_domains: *
+    no_ssl_bump_domains: all
 deploy:
   provider: heroku
   api_key:
