@@ -4,7 +4,9 @@ import java.time.{LocalDateTime, Duration}
 
 import akka.actor._
 import akka.event.LoggingReceive
+import com.typesafe.config.Config
 import controllers.{Register, Move}
+import play.api.{Play, Configuration}
 import play.api.mvc._
 import play.api.Play.current
 import akka.actor.ActorLogging
@@ -157,8 +159,12 @@ class MongoActor extends Actor with ActorLogging {
 
   // gets an instance of the driver
   // (creates an actor system)
+  val uri = Play.configuration.getString("mongodb.uri").get
   val driver = new MongoDriver
-  val connection = driver.connection(List("localhost"))
+  val connection = (for {
+    uri <- Play.configuration.getString("mongodb.uri")
+    parsedURI <- MongoConnection.parseURI(uri).toOption
+  } yield driver.connection(parsedURI)).orNull
 
   def receive = LoggingReceive {
     case msg@Register(player, headers) => {
