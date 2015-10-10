@@ -158,16 +158,20 @@ object BSONMap {
 }
 
 class MongoActor extends Actor with ActorLogging {
-  import BSONMap._
-
   // gets an instance of the driver
   // (creates an actor system)
-  val uri = Play.configuration.getString("mongodb.uri").get
   val driver = new MongoDriver
-  val connection = (for {
+
+  val db = (for {
     uri <- Play.configuration.getString("mongodb.uri")
     parsedURI <- MongoConnection.parseURI(uri).toOption
-  } yield driver.connection(parsedURI)).orNull
+    conn = driver.connection(parsedURI)
+    dbName <- parsedURI.db.orElse(Some("awale")) // for Heroku, db is in the URI, otherwise, it's awale
+  } yield conn(dbName)).orNull
+
+  // Gets a reference to the collection "events"
+  // By default, you get a BSONCollection.
+  val collection = db("events")
 
   def receive = LoggingReceive {
     case msg@Register(player, headers) => {
@@ -177,12 +181,6 @@ class MongoActor extends Actor with ActorLogging {
         "headers" -> BSONDocument(headers.toMap.map{case (k, v) => k -> BSONArray(v)}),
         "playerId" -> player.playerId
       )
-      // Gets a reference to the database "plugin"
-      val db = connection("plugin")
-
-      // Gets a reference to the collection "acoll"
-      // By default, you get a BSONCollection.
-      val collection = db("acoll")
 
       val future = collection.insert(event)
 
@@ -201,12 +199,6 @@ class MongoActor extends Actor with ActorLogging {
         "playerId" -> member.playerId,
         "gameId" -> gameId
       )
-      // Gets a reference to the database "plugin"
-      val db = connection("plugin")
-
-      // Gets a reference to the collection "acoll"
-      // By default, you get a BSONCollection.
-      val collection = db("acoll")
 
       val future = collection.insert(event)
 
@@ -224,12 +216,6 @@ class MongoActor extends Actor with ActorLogging {
         "playerId" -> member.playerId,
         "gameId" -> gameId
       )
-      // Gets a reference to the database "plugin"
-      val db = connection("plugin")
-
-      // Gets a reference to the collection "acoll"
-      // By default, you get a BSONCollection.
-      val collection = db("acoll")
 
       val future = collection.insert(event)
 
@@ -248,12 +234,6 @@ class MongoActor extends Actor with ActorLogging {
         "playerId" -> playerId,
         "sowId" -> sowId
       )
-      // Gets a reference to the database "plugin"
-      val db = connection("plugin")
-
-      // Gets a reference to the collection "acoll"
-      // By default, you get a BSONCollection.
-      val collection = db("acoll")
 
       val future = collection.insert(event)
 
