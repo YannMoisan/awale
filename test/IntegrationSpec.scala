@@ -65,6 +65,44 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.findFirst("#game").isDisplayed must equalTo(true)
     })
 
+    "allow one user to create a game, and another user to join, the first one to disconnect, and the second one to be notified" in ((s: String) => new WithBrowser(driver(s)) {
+
+      browser.goTo("http://localhost:" + port)
+
+      browser.pageSource must contain("Awale")
+
+      browser.click("#click")
+
+      browser.pageSource must contain("To invite")
+
+      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+
+      browser.findFirst("#invitation").isDisplayed must equalTo(true)
+      browser.findFirst("#game").isDisplayed must equalTo(false)
+
+      val joinUrl = browser.$("#join-url").getValue
+
+      browser.goToInNewTab(joinUrl)
+
+      browser.findFirst("#invitation").isDisplayed must equalTo(false)
+      browser.findFirst("#game").isDisplayed must equalTo(true)
+
+      browser.firstTab()
+
+      browser.findFirst("#invitation").isDisplayed must equalTo(false)
+      browser.findFirst("#game").isDisplayed must equalTo(true)
+
+      browser.webDriver.close()
+
+      // when I close, do I need to switch ?
+      // it remains only one window
+      val tabs = browser.getDriver.getWindowHandles()
+      browser.getDriver.switchTo().window(tabs.iterator().next())
+
+      browser.findFirst("#disconnected").isDisplayed must equalTo(true)
+    })
+
+
     "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(driver(s)) {
 
       browser.goTo("http://localhost:" + port)
