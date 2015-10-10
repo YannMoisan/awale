@@ -30,9 +30,9 @@ class EventStore extends Actor with ActorLogging {
   val collection = db("events")
 
   def receive = LoggingReceive {
-    case msg@Register(player, headers, remoteAddress) => {
+    case msg@Connect(player, headers, remoteAddress) => {
       val event = BSONDocument(
-        "type" -> "register",
+        "type" -> "connect",
         "timestamp" -> LocalDateTime.now.toString,
         "headers" -> BSONDocument(headers.toMap.map{case (k, v) => k -> BSONArray(v)}),
         "remoteAddress" -> remoteAddress,
@@ -49,11 +49,11 @@ class EventStore extends Actor with ActorLogging {
       }
     }
 
-    case Join(member, gameId) => {
+    case Join(gameId, player) => {
       val event = BSONDocument(
         "type" -> "join",
         "timestamp" -> LocalDateTime.now.toString,
-        "playerId" -> member.playerId,
+        "playerId" -> player.playerId,
         "gameId" -> gameId
       )
 
@@ -66,11 +66,11 @@ class EventStore extends Actor with ActorLogging {
         }
       }
     }
-    case Create(member, gameId) => {
+    case Create(gameId, player) => {
       val event = BSONDocument(
         "type" -> "create",
         "timestamp" -> LocalDateTime.now.toString,
-        "playerId" -> member.playerId,
+        "playerId" -> player.playerId,
         "gameId" -> gameId
       )
 
