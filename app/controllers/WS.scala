@@ -23,23 +23,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object MyController extends Controller {
 
   def socket = WebSocket.acceptWithActor[String, String] { request => out =>
-    println("session:"+request.session)
-    println("headers:"+request.headers)
-    println("cookies:"+request.cookies)
-    println("remoteAddress:"+request.remoteAddress)
-    ReceiverActor.props(out, request.headers)
+    ReceiverActor.props(out, request.headers, request.remoteAddress)
   }
 }
 
 object ReceiverActor {
-  def props(out: ActorRef, headers: Headers) = Props(new ReceiverActor(out, headers))
+  def props(out: ActorRef, headers: Headers, remoteAddress: String) = Props(new ReceiverActor(out, headers, remoteAddress))
 }
 
 object Random {
   def nextId : String = scala.util.Random.alphanumeric.take(6).mkString.toLowerCase
 }
 
-class ReceiverActor(out: ActorRef, headers: Headers) extends Actor {
+class ReceiverActor(out: ActorRef, headers: Headers, remoteAddress: String) extends Actor {
   var playerId = Random.nextId
   val supervisor = context.actorSelection("/user/supervisor")
 
@@ -50,10 +46,10 @@ class ReceiverActor(out: ActorRef, headers: Headers) extends Actor {
         supervisor ! Create(Player(self, out, playerId), Random.nextId)
 
       case Array("connect", _) =>
-        supervisor ! Register(Player(self, out, playerId), headers)
+        supervisor ! Register(Player(self, out, playerId), headers, remoteAddress)
 
       case Array("join", gameId) =>
-        supervisor ! Register(Player(self, out, playerId), headers)
+        supervisor ! Register(Player(self, out, playerId), headers, remoteAddress)
         supervisor ! Join(Player(self, out, playerId), gameId)
 
       case Array("move", gameId, sowId) =>
@@ -86,7 +82,7 @@ class SupervisorActor extends Actor with ActorLogging {
       members.foreach(_.out ! s"stats:$nbPlayers:$nbGames")
     }
 
-    case msg@Register(player, headers) => {
+    case msg@Register(player, headers, remoteAddress) => {
       context.actorSelection("/user/store") ! msg
       log.debug("Register:{}", player.playerId)
       members.+=(player)
@@ -174,11 +170,12 @@ class MongoActor extends Actor with ActorLogging {
   val collection = db("events")
 
   def receive = LoggingReceive {
-    case msg@Register(player, headers) => {
+    case msg@Register(player, headers, remoteAddress) => {
       val event = BSONDocument(
         "type" -> "register",
         "timestamp" -> LocalDateTime.now.toString,
         "headers" -> BSONDocument(headers.toMap.map{case (k, v) => k -> BSONArray(v)}),
+        "remoteAddress" -> remoteAddress,
         "playerId" -> player.playerId
       )
 
@@ -253,7 +250,7 @@ case class Create(member : Player, gameId: String)
 case class Join(member : Player, gameId: String)
 case class Move(gameId : String, playerId : String, sowId: String)
 // Player
-case class Register(member : Player, headers: Headers)
+case class Register(member : Player, headers: Headers, remoteAddress: String)
 
 // Out Message
 case class Close(playerId : String)
