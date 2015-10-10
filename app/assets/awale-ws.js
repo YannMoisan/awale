@@ -51,8 +51,10 @@ awale.ctrl = {
     }
     if (arr[0] === "active") {
       awale.time={time0:+arr[2], time1:+arr[3]};
-      awale.game = awale.game.play(+arr[1]);
-      awale.view.animateSowing();
+      if (arr[1] !== "") { // init case
+        awale.game = awale.game.play(+arr[1]);
+        awale.view.animateSowing();
+      }
     }
     if (arr[0] === "close") {
       awale.status = "disconnected";

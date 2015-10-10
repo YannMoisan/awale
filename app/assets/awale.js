@@ -9,10 +9,12 @@
 //var transitionEvent = whichTransitionEvent();
 
 awale.view = {
-    secondsToString: function(nb) {
-      var min = Math.ceil(nb/60);
-      var sec = nb % 60;
-      return min + ":" + sec;
+    formatTime: function(nbSeconds) {
+      var min = Math.floor(nbSeconds/60);
+      var sec = nbSeconds % 60;
+      var formattedMin = min.toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
+      var formattedSec = sec.toLocaleString('fr-FR', { minimumIntegerDigits: 2 });
+      return formattedMin + ":" + formattedSec;
     },
     refresh: function () {
         if (awale.status === "begin") {
@@ -39,8 +41,8 @@ awale.view = {
             document.getElementById("disconnected").style.display = 'none';
 
             if (awale.time) {
-                document.getElementById("time0").innerHTML = this.secondsToString(awale.time.time0);
-                document.getElementById("time1").innerHTML = this.secondsToString(awale.time.time1);
+                document.getElementById("time0").innerHTML = this.formatTime(awale.time.time0);
+                document.getElementById("time1").innerHTML = this.formatTime(awale.time.time1);
             }
         } else if (awale.status === "disconnected") {
             document.getElementById("disconnected").style.display = 'block';
@@ -74,10 +76,10 @@ awale.view = {
                 //awale.view.intervalID = window.setInterval(function() {
                 //    if (awale.game.curPlayer === 0) {
                 //        awale.time.time0 += 1;
-                //        document.getElementById("time0").innerHTML = awale.view.secondsToString(awale.time.time0);
+                //        document.getElementById("time0").innerHTML = awale.view.formatTime(awale.time.time0);
                 //    } else {
                 //        awale.time.time0 += 1;
-                //        document.getElementById("time1").innerHTML = awale.view.secondsToString(awale.time.time0);
+                //        document.getElementById("time1").innerHTML = awale.view.formatTime(awale.time.time0);
                 //    }
                 //}, 1000);
             } else {
