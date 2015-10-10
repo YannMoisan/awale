@@ -1,31 +1,10 @@
-package controllers
+package actors
 
-import java.time.{LocalDateTime, Duration}
+import java.time.{Duration, LocalDateTime}
 
-import akka.actor._
+import akka.actor.{ActorLogging, Actor, Props, ActorRef}
 import akka.event.LoggingReceive
-import com.typesafe.config.Config
-import controllers.{Register, Move}
-import play.api.{Play, Configuration}
-import play.api.mvc._
-import play.api.Play.current
-import akka.actor.ActorLogging
-
-import reactivemongo.api._
-import reactivemongo.bson._
-
-import scala.concurrent.Future
-import scala.util.{Success, Failure}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-
-
-object MyController extends Controller {
-
-  def socket = WebSocket.acceptWithActor[String, String] { request => out =>
-    ReceiverActor.props(out, request.headers, request.remoteAddress)
-  }
-}
+import play.api.mvc.Headers
 
 object ReceiverActor {
   def props(out: ActorRef, headers: Headers, remoteAddress: String) = Props(new ReceiverActor(out, headers, remoteAddress))
@@ -132,118 +111,6 @@ class SupervisorActor extends Actor with ActorLogging {
   }
 }
 
-object BSONMap {
-  implicit def MapReader[V](implicit vr: BSONDocumentReader[V]): BSONDocumentReader[Map[String, V]] = new BSONDocumentReader[Map[String, V]] {
-    def read(bson: BSONDocument): Map[String, V] = {
-      val elements = bson.elements.map { tuple =>
-        // assume that all values in the document are BSONDocuments
-        tuple._1 -> vr.read(tuple._2.seeAsTry[BSONDocument].get)
-      }
-      elements.toMap
-    }
-  }
-
-  implicit def MapWriter[V](implicit vw: BSONDocumentWriter[V]): BSONDocumentWriter[Map[String, V]] = new BSONDocumentWriter[Map[String, V]] {
-    def write(map: Map[String, V]): BSONDocument = {
-      val elements = map.toStream.map { tuple =>
-        tuple._1 -> vw.write(tuple._2)
-      }
-      BSONDocument(elements)
-    }
-  }
-}
-
-class MongoActor extends Actor with ActorLogging {
-  // gets an instance of the driver
-  // (creates an actor system)
-  val driver = new MongoDriver
-
-  val db = (for {
-    uri <- Play.configuration.getString("mongodb.uri")
-    parsedURI <- MongoConnection.parseURI(uri).toOption
-    conn = driver.connection(parsedURI)
-    dbName <- parsedURI.db.orElse(Some("awale")) // for Heroku, db is in the URI, otherwise, it's awale
-  } yield conn(dbName)).orNull
-
-  // Gets a reference to the collection "events"
-  // By default, you get a BSONCollection.
-  val collection = db("events")
-
-  def receive = LoggingReceive {
-    case msg@Register(player, headers, remoteAddress) => {
-      val event = BSONDocument(
-        "type" -> "register",
-        "timestamp" -> LocalDateTime.now.toString,
-        "headers" -> BSONDocument(headers.toMap.map{case (k, v) => k -> BSONArray(v)}),
-        "remoteAddress" -> remoteAddress,
-        "playerId" -> player.playerId
-      )
-
-      val future = collection.insert(event)
-
-      future.onComplete {
-        case Failure(e) => throw e
-        case Success(lastError) => {
-          println("successfully inserted document with lastError = " + lastError)
-        }
-      }
-    }
-
-    case Join(member, gameId) => {
-      val event = BSONDocument(
-        "type" -> "join",
-        "timestamp" -> LocalDateTime.now.toString,
-        "playerId" -> member.playerId,
-        "gameId" -> gameId
-      )
-
-      val future = collection.insert(event)
-
-      future.onComplete {
-        case Failure(e) => throw e
-        case Success(lastError) => {
-          println("successfully inserted document with lastError = " + lastError)
-        }
-      }
-    }
-    case Create(member, gameId) => {
-      val event = BSONDocument(
-        "type" -> "create",
-        "timestamp" -> LocalDateTime.now.toString,
-        "playerId" -> member.playerId,
-        "gameId" -> gameId
-      )
-
-      val future = collection.insert(event)
-
-      future.onComplete {
-        case Failure(e) => throw e
-        case Success(lastError) => {
-          println("successfully inserted document with lastError = " + lastError)
-        }
-      }
-    }
-    case Move(gameId, playerId, sowId) => {
-      val event = BSONDocument(
-        "type" -> "move",
-        "timestamp" -> LocalDateTime.now.toString,
-        "gameId" -> gameId,
-        "playerId" -> playerId,
-        "sowId" -> sowId
-      )
-
-      val future = collection.insert(event)
-
-      future.onComplete {
-        case Failure(e) => throw e
-        case Success(lastError) => {
-          println("successfully inserted document with lastError = " + lastError)
-        }
-      }
-    }
-  }
-}
-
 // In Message
 // Game
 case class Create(member : Player, gameId: String)
@@ -266,7 +133,7 @@ case class PreGame(gameId: String, player1 : Player) extends Game {
 }
 
 case class ReadyGame(gameId: String, player1 : Player, player2 : Player,
-                currentPlayer : Integer, lastDate : LocalDateTime, p1Duration : Duration, p2Duration : Duration) extends Game {
+                     currentPlayer : Integer, lastDate : LocalDateTime, p1Duration : Duration, p2Duration : Duration) extends Game {
   def move(sowId: String) = {
     val curLDT = LocalDateTime.now
     this.copy(

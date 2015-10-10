@@ -1,19 +1,14 @@
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-import akka.actor.Props
-import controllers.{SupervisorActor, MyController}
 import org.fluentlenium.core.Fluent
+import org.junit.runner._
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.junit.runner._
-import play.api.libs.concurrent.Akka
-import play.api.{GlobalSettings, Application}
-
-import play.api.test._
 import play.api.test.Helpers._
+import play.api.test._
 
 import scala.collection.JavaConversions._
 
