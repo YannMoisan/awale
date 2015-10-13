@@ -12,11 +12,14 @@ import reactivemongo.bson.{BSONArray, BSONDocument}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
+import play.libs.Akka
+
+
 // Event store based on MongoDB
 class EventStore extends Actor with ActorLogging {
   // gets an instance of the driver
   // (creates an actor system)
-  val driver = new MongoDriver
+  val driver = new MongoDriver(Akka.system)
 
   val db = (for {
     uri <- Play.configuration.getString("mongodb.uri")
