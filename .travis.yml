@@ -28,14 +28,15 @@ branches:
     - /build-.+-\d{4}-\d{2}-\d{2}-.*/
 deploy:
   - provider: releases
-  skip_cleanup: true
-  api_key:
-    secure: iHdbfVaB1ULRcAdJjaT81x8yWTzqEvqbQKY85JiE26Z6nZj8vXVSirUz2DXWi+4nPQJRPlsQn055u2v++vn0yN3SupdoDRBCHzRuXfB3VWpkL7Y2CfVo8ZZOhf/j5bT8UbB6+1LNjreUJUtCFAUHdKV302MEm4zZJ4gZainqjAp0jxC7798eC7DEH5Z58ZSoM4JzzPRIP28lW1zlePqWwfoLJ+gV2DgyH2Y+aZaHZdneU7v4pS+Oh04fRDeE53aeGgxQTya0iyeEg4pKcedsCMF3vqhTimfTHaEjRxDjl9lOf1AXA1c5us10+RAPK4xNfzuh6/J2eArnNJzY1+2uPq86Lju3fNzMIevFECImB3T8HiuaFqM4Z41fGfPE854wqaXamsFwuwXI7PbNu1Y6s5gXABRhCTe1Gdgohj2WdtwvBqiYAR6q0Np9jqDjZPOVnVE5vr9KhJVsyVNCCeHbaIpCOUm4EzJ05knYCurfZ7g2bCxs6HlbGh8Rs1JSod6xXCfZkGroibB9prA0+fmD6IN+AsTXqyTZ7Cyx2spUdgi2ImO3vH6D9sPV6gy8vB3BxJlWTDTi9/i6BK/K3XAAeHrc6PgARPvfThhXU+2QJvV2I9sfyKFW2S4gKMzhlBzh4OaYzzD+LEukAPabM1e9OCcGyBnqwI5ajla8BwHYvnk=
-  file: target/universal/awale-1.0-SNAPSHOT.zip
-  on:
-    repo: YannMoisan/awale
+    skip_cleanup: true
+    api_key:
+      secure: iHdbfVaB1ULRcAdJjaT81x8yWTzqEvqbQKY85JiE26Z6nZj8vXVSirUz2DXWi+4nPQJRPlsQn055u2v++vn0yN3SupdoDRBCHzRuXfB3VWpkL7Y2CfVo8ZZOhf/j5bT8UbB6+1LNjreUJUtCFAUHdKV302MEm4zZJ4gZainqjAp0jxC7798eC7DEH5Z58ZSoM4JzzPRIP28lW1zlePqWwfoLJ+gV2DgyH2Y+aZaHZdneU7v4pS+Oh04fRDeE53aeGgxQTya0iyeEg4pKcedsCMF3vqhTimfTHaEjRxDjl9lOf1AXA1c5us10+RAPK4xNfzuh6/J2eArnNJzY1+2uPq86Lju3fNzMIevFECImB3T8HiuaFqM4Z41fGfPE854wqaXamsFwuwXI7PbNu1Y6s5gXABRhCTe1Gdgohj2WdtwvBqiYAR6q0Np9jqDjZPOVnVE5vr9KhJVsyVNCCeHbaIpCOUm4EzJ05knYCurfZ7g2bCxs6HlbGh8Rs1JSod6xXCfZkGroibB9prA0+fmD6IN+AsTXqyTZ7Cyx2spUdgi2ImO3vH6D9sPV6gy8vB3BxJlWTDTi9/i6BK/K3XAAeHrc6PgARPvfThhXU+2QJvV2I9sfyKFW2S4gKMzhlBzh4OaYzzD+LEukAPabM1e9OCcGyBnqwI5ajla8BwHYvnk=
+    file: target/universal/awale-1.0-SNAPSHOT.zip
+    on:
+      repo: YannMoisan/awale
   - provider: heroku
-  api_key:
-     secure: mQRBcS7B3wyllTOC5iGvMa2sULJbc72VlCT24t+xhIUeg5UpXbT0SCkfIua5N4FkP63iF8/FAqinDIevoj83eAdbWj1sTmx6HEp3TL01I2m8VKjtMPNz6mEtmwsUCkQGZm5mmoJ55g7trIXNcHd7kUi6mnC3WjtbxjVT1LgDZpYi/UX2
-   app: awale
-   repo: YannMoisan/awale
+    api_key:
+      secure: mQRBcS7B3wyllTOC5iGvMa2sULJbc72VlCT24t+xhIUeg5UpXbT0SCkfIua5N4FkP63iF8/FAqinDIevoj83eAdbWj1sTmx6HEp3TL01I2m8VKjtMPNz6mEtmwsUCkQGZm5mmoJ55g7trIXNcHd7kUi6mnC3WjtbxjVT1LgDZpYi/UX2
+    app: awale
+    on:
+      repo: YannMoisan/awale
