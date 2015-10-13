@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.specs2.mutable._
 import org.specs2.runner._
+import org.specs2.specification.{Fragments, Fragment}
 import play.api.test.Helpers._
 import play.api.test._
 
@@ -22,22 +23,26 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
   "Application" should {
 
-    "allow one user to create a game" in ((s: String) => new WithBrowser(driver(s)) {
+    examplesBlock {
+      for (d <- driver("1")) {
+        "allow one user to create a game" in ((s: String) => new WithBrowser(d) {
 
-      browser.goTo("http://localhost:" + port)
+          browser.goTo("http://localhost:" + port)
 
-      browser.pageSource must contain("Awale")
+          browser.pageSource must contain("Awale")
 
-      browser.click("#click")
+          browser.click("#click")
 
-      browser.pageSource must contain("To invite")
+          browser.pageSource must contain("To invite")
 
-      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
-      browser.findFirst("#invitation").isDisplayed must equalTo(true)
-      browser.findFirst("#game").isDisplayed must equalTo(false)
-    })
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+          browser.findFirst("#invitation").isDisplayed must equalTo(true)
+          browser.findFirst("#game").isDisplayed must equalTo(false)
+    })}}
 
-    "allow one user to create a game, and another user to join" in ((s: String) => new WithBrowser(driver(s)) {
+    examplesBlock {
+      for (d <- driver("2")) {
+    "allow one user to create a game, and another user to join" in ((s: String) => new WithBrowser(d) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -63,9 +68,11 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
       browser.findFirst("#invitation").isDisplayed must equalTo(false)
       browser.findFirst("#game").isDisplayed must equalTo(true)
-    })
+    })}}
 
-    "allow one user to create a game, and another user to join, the first one to disconnect, and the second one to be notified" in ((s: String) => new WithBrowser(driver(s)) {
+    examplesBlock {
+      for (d <- driver("3")) {
+    "allow one user to create a game, and another user to join, the first one to disconnect, and the second one to be notified" in ((s: String) => new WithBrowser(d) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -100,10 +107,12 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.getDriver.switchTo().window(tabs.iterator().next())
 
       browser.findFirst("#disconnected").isDisplayed must equalTo(true)
-    })
+    })}}
 
 
-    "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(driver(s)) {
+    examplesBlock {
+      for (d <- driver("4")) {
+    "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(d) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -132,7 +141,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       browser.find(".col").get(6).click()
       browser.await().atMost(5, TimeUnit.SECONDS).until("#passive").areDisplayed()
       browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
-    })
+    })}}
 
 
   }
@@ -160,18 +169,20 @@ object FluentExtensions {
 }
 
 trait EnvAwareDriver {
-  def driver(name: String): WebDriver = {
+  def driver(name: String): Seq[WebDriver] = {
 //    WebDriverFactory(FIREFOX)
     if (System.getenv("CI") != "true") {
-      WebDriverFactory(FIREFOX)
+      List(WebDriverFactory(FIREFOX))
     } else {
-      val caps = DesiredCapabilities.firefox()
-      caps.setCapability("platform", "Windows 7")
-      caps.setCapability("version", "38.0")
-      caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
-      caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
-      caps.setCapability("name", name)
-      new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
+      List("36.0", "37.0", "38.0").map { v =>
+        val caps = DesiredCapabilities.firefox()
+        caps.setCapability("platform", "Windows 7")
+        caps.setCapability("version", v)
+        caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
+        caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
+        caps.setCapability("name", name)
+        new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
+      }
     }
   }
 }
