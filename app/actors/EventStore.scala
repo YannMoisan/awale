@@ -19,7 +19,7 @@ import play.libs.Akka
 class EventStore extends Actor with ActorLogging {
   // gets an instance of the driver
   // (creates an actor system)
-  val driver = new MongoDriver(Akka.system)
+  val driver = new MongoDriver()
 
   val db = (for {
     uri <- Play.configuration.getString("mongodb.uri")
@@ -104,5 +104,10 @@ class EventStore extends Actor with ActorLogging {
         }
       }
     }
+  }
+
+  override def postStop(): Unit = {
+    println("closing connections")
+    driver.close()
   }
 }
