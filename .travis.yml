@@ -12,7 +12,7 @@ env:
   - secure: gp8tmQ4Kfkz/rYUhcjoeyRW0tVjnxWv4UuVyzVlWMY7LektSAJR+JKqOcXOer3qFWTVo2p9cq6+LSOPlGiN3QeLcad7EBhivQitYus28StvswaLhrYGV+/JNWjaI0GAY5TyZahUYsrGdCh2xWMMHVNQTp/hYUULSyyQ9xwB4KJkXvUTREy0cDHoXj3rk9l2yZYryu/RoPRd2UVT6yj8CHLKW7pkKHEOcuqVYh9GwfcpgJdLdKaJiMCctZK1pPW8UFldkXulHoAbxBJzLwPthbQMPxKf9F4zJOmc9HlnFVJecmyaf1g3vNQlzSet87pIJHh8/2kTpWU94KysNMPtRqPda4omg+c73x3pffkgSDQEnmHhGi6cGDX8ID9Mhwg664DDa2JHh2iBRL2Q5pEkdODZl64F7c+6yEQosxVdDAi1IfXbY8LphlDtk8BeO8aELCSyJ/DRhorwuc6GzLvR0akuFBCywjzaj+xP+UffmbTIvh8WHWd5AqthVPI3bE+ztapgjkrLYfM5tLtDgpqOza/96zQPEfQhmcFOdeMtMqAKoOCd8wxgxneB28vN8OAIsR3lVhTWFDxtRFgeIR1iwzeQbXmT8TywjmJOAQcXSWe25srw0R1TC/pl73g2CYrMl1vMTfQ2CqF2k0qabydNYr1z5OStGSk3wtcEBELAFX6k=
   - secure: e5nukDq8Qv/4k/SYjfUXXUEdqg/VAh9OcPYsz7e2zgKr82xuVa4gHrV+JeZX1RLBz5+a6xV6ZQgOY2FH5RSsjiCuBZz8ENPr4O1lRZTrry5xYhVVI7GJXgNlaFmEM0KV97HHDQ64NL2FmEHNw7DjegxPto77rbD/4UYJB9mak+0/3rFIE2tD9JW59tu/olmqdQ5kcJXIU0F7pQ2XE+pKSIK98zoWj4fGBGxN5ndBW59ZI3YYeCK5LPDyaKjNAb+DvJ8XSRIMwmVNrHJy0l94kK3VAFx9wmKbcv72rfM0Ms6bgTMafUg8AGhGTQkNaQtYIIznoRO3UYNYreMEIYSew2ceBzid7EMLxq+lqfabMaIV1D0ngI4gEBtpz6D0mcXkonsdQSiAT9t+cZ08Uq1s0v+0hhWhtl4ESxC8o7herIhjBCXYwS4nUGPAeDsUsT25z5aePtDLEuou/H0WR+jJS2AI/3mvaQGa0sQEaryH6R0ukQ4dknM5lXsIPultBN3ZgFrOmANoU9MabOJn6OZ9EqYv2YapQ31dxeIPBeTGPknUmBfuzG+/Bu+6G7OR4XBJzMQWaZZcLMBD7t7N/hssWeWScXHbfSI5WuvDXcEatQh0oZe4bJCaQHWgjrduMlrprcalw6bFbMLvK/KKCcrCQmJTGPOd48Lv7wBQwhZ8FHk=
 services:
-- mongodb
+  - mongodb
 addons:
   sauce_connect:
     no_ssl_bump_domains: all
@@ -27,17 +27,17 @@ after_success:
 #  except:
 #  - /build-.+-\d{4}-\d{2}-\d{2}-.*/
 deploy:
-- provider: releases
-  skip_cleanup: true
-  api_key:
-    secure: iHdbfVaB1ULRcAdJjaT81x8yWTzqEvqbQKY85JiE26Z6nZj8vXVSirUz2DXWi+4nPQJRPlsQn055u2v++vn0yN3SupdoDRBCHzRuXfB3VWpkL7Y2CfVo8ZZOhf/j5bT8UbB6+1LNjreUJUtCFAUHdKV302MEm4zZJ4gZainqjAp0jxC7798eC7DEH5Z58ZSoM4JzzPRIP28lW1zlePqWwfoLJ+gV2DgyH2Y+aZaHZdneU7v4pS+Oh04fRDeE53aeGgxQTya0iyeEg4pKcedsCMF3vqhTimfTHaEjRxDjl9lOf1AXA1c5us10+RAPK4xNfzuh6/J2eArnNJzY1+2uPq86Lju3fNzMIevFECImB3T8HiuaFqM4Z41fGfPE854wqaXamsFwuwXI7PbNu1Y6s5gXABRhCTe1Gdgohj2WdtwvBqiYAR6q0Np9jqDjZPOVnVE5vr9KhJVsyVNCCeHbaIpCOUm4EzJ05knYCurfZ7g2bCxs6HlbGh8Rs1JSod6xXCfZkGroibB9prA0+fmD6IN+AsTXqyTZ7Cyx2spUdgi2ImO3vH6D9sPV6gy8vB3BxJlWTDTi9/i6BK/K3XAAeHrc6PgARPvfThhXU+2QJvV2I9sfyKFW2S4gKMzhlBzh4OaYzzD+LEukAPabM1e9OCcGyBnqwI5ajla8BwHYvnk=
-  file: target/universal/awale-1.0-SNAPSHOT.zip
-  on:
-    repo: YannMoisan/awale
-    tags: true
-- provider: heroku
-  api_key:
-    secure: mQRBcS7B3wyllTOC5iGvMa2sULJbc72VlCT24t+xhIUeg5UpXbT0SCkfIua5N4FkP63iF8/FAqinDIevoj83eAdbWj1sTmx6HEp3TL01I2m8VKjtMPNz6mEtmwsUCkQGZm5mmoJ55g7trIXNcHd7kUi6mnC3WjtbxjVT1LgDZpYi/UX2
-  app: awale
-  on:
-    repo: YannMoisan/awale
+  - provider: releases
+    skip_cleanup: true
+    api_key:
+      secure: iHdbfVaB1ULRcAdJjaT81x8yWTzqEvqbQKY85JiE26Z6nZj8vXVSirUz2DXWi+4nPQJRPlsQn055u2v++vn0yN3SupdoDRBCHzRuXfB3VWpkL7Y2CfVo8ZZOhf/j5bT8UbB6+1LNjreUJUtCFAUHdKV302MEm4zZJ4gZainqjAp0jxC7798eC7DEH5Z58ZSoM4JzzPRIP28lW1zlePqWwfoLJ+gV2DgyH2Y+aZaHZdneU7v4pS+Oh04fRDeE53aeGgxQTya0iyeEg4pKcedsCMF3vqhTimfTHaEjRxDjl9lOf1AXA1c5us10+RAPK4xNfzuh6/J2eArnNJzY1+2uPq86Lju3fNzMIevFECImB3T8HiuaFqM4Z41fGfPE854wqaXamsFwuwXI7PbNu1Y6s5gXABRhCTe1Gdgohj2WdtwvBqiYAR6q0Np9jqDjZPOVnVE5vr9KhJVsyVNCCeHbaIpCOUm4EzJ05knYCurfZ7g2bCxs6HlbGh8Rs1JSod6xXCfZkGroibB9prA0+fmD6IN+AsTXqyTZ7Cyx2spUdgi2ImO3vH6D9sPV6gy8vB3BxJlWTDTi9/i6BK/K3XAAeHrc6PgARPvfThhXU+2QJvV2I9sfyKFW2S4gKMzhlBzh4OaYzzD+LEukAPabM1e9OCcGyBnqwI5ajla8BwHYvnk=
+    file: target/universal/awale-1.0-SNAPSHOT.zip
+    on:
+      repo: YannMoisan/awale
+      tags: true
+  - provider: heroku
+    api_key:
+      secure: mQRBcS7B3wyllTOC5iGvMa2sULJbc72VlCT24t+xhIUeg5UpXbT0SCkfIua5N4FkP63iF8/FAqinDIevoj83eAdbWj1sTmx6HEp3TL01I2m8VKjtMPNz6mEtmwsUCkQGZm5mmoJ55g7trIXNcHd7kUi6mnC3WjtbxjVT1LgDZpYi/UX2
+    app: awale
+    on:
+      repo: YannMoisan/awale
