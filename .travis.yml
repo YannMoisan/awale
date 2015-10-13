@@ -41,4 +41,4 @@ deploy:
     file: target/universal/awale-1.0-SNAPSHOT.zip
     on:
       repo: YannMoisan/awale
-      tags: true
+#      tags: true
