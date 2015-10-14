@@ -24,8 +24,8 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
   "Application" should {
 
     examplesBlock {
-      for (d <- driver("1")) {
-        "allow one user to create a game" in ((s: String) => new WithBrowser(d) {
+      for (d <- drivers) {
+        "allow one user to create a game" in ((s: String) => new WithBrowser(d(s)) {
 
           browser.goTo("http://localhost:" + port)
 
@@ -41,106 +41,106 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
     })}}
 
     examplesBlock {
-      for (d <- driver("2")) {
-    "allow one user to create a game, and another user to join" in ((s: String) => new WithBrowser(d) {
+      for (d <- drivers) {
+        "allow one user to create a game, and another user to join" in ((s: String) => new WithBrowser(d(s)) {
 
-      browser.goTo("http://localhost:" + port)
+          browser.goTo("http://localhost:" + port)
 
-      browser.pageSource must contain("Awale")
+          browser.pageSource must contain("Awale")
 
-      browser.click("#click")
+          browser.click("#click")
 
-      browser.pageSource must contain("To invite")
+          browser.pageSource must contain("To invite")
 
-      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
 
-      browser.findFirst("#invitation").isDisplayed must equalTo(true)
-      browser.findFirst("#game").isDisplayed must equalTo(false)
+          browser.findFirst("#invitation").isDisplayed must equalTo(true)
+          browser.findFirst("#game").isDisplayed must equalTo(false)
 
-      val joinUrl = browser.$("#join-url").getValue
+          val joinUrl = browser.$("#join-url").getValue
 
-      browser.goToInNewTab(joinUrl)
+          browser.goToInNewTab(joinUrl)
 
-      browser.findFirst("#invitation").isDisplayed must equalTo(false)
-      browser.findFirst("#game").isDisplayed must equalTo(true)
+          browser.findFirst("#invitation").isDisplayed must equalTo(false)
+          browser.findFirst("#game").isDisplayed must equalTo(true)
 
-      browser.firstTab()
+          browser.firstTab()
 
-      browser.findFirst("#invitation").isDisplayed must equalTo(false)
-      browser.findFirst("#game").isDisplayed must equalTo(true)
+          browser.findFirst("#invitation").isDisplayed must equalTo(false)
+          browser.findFirst("#game").isDisplayed must equalTo(true)
     })}}
 
     examplesBlock {
-      for (d <- driver("3")) {
-    "allow one user to create a game, and another user to join, the first one to disconnect, and the second one to be notified" in ((s: String) => new WithBrowser(d) {
+      for (d <- drivers) {
+        "allow one user to create a game, and another user to join, the first one to disconnect, and the second one to be notified" in ((s: String) => new WithBrowser(d(s)) {
 
-      browser.goTo("http://localhost:" + port)
+          browser.goTo("http://localhost:" + port)
 
-      browser.pageSource must contain("Awale")
+          browser.pageSource must contain("Awale")
 
-      browser.click("#click")
+          browser.click("#click")
 
-      browser.pageSource must contain("To invite")
+          browser.pageSource must contain("To invite")
 
-      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
 
-      browser.findFirst("#invitation").isDisplayed must equalTo(true)
-      browser.findFirst("#game").isDisplayed must equalTo(false)
+          browser.findFirst("#invitation").isDisplayed must equalTo(true)
+          browser.findFirst("#game").isDisplayed must equalTo(false)
 
-      val joinUrl = browser.$("#join-url").getValue
+          val joinUrl = browser.$("#join-url").getValue
 
-      browser.goToInNewTab(joinUrl)
+          browser.goToInNewTab(joinUrl)
 
-      browser.findFirst("#invitation").isDisplayed must equalTo(false)
-      browser.findFirst("#game").isDisplayed must equalTo(true)
+          browser.findFirst("#invitation").isDisplayed must equalTo(false)
+          browser.findFirst("#game").isDisplayed must equalTo(true)
 
-      browser.firstTab()
+          browser.firstTab()
 
-      browser.findFirst("#invitation").isDisplayed must equalTo(false)
-      browser.findFirst("#game").isDisplayed must equalTo(true)
+          browser.findFirst("#invitation").isDisplayed must equalTo(false)
+          browser.findFirst("#game").isDisplayed must equalTo(true)
 
-      browser.webDriver.close()
+          browser.webDriver.close()
 
-      // when I close, do I need to switch ?
-      // it remains only one window
-      val tabs = browser.getDriver.getWindowHandles()
-      browser.getDriver.switchTo().window(tabs.iterator().next())
+          // when I close, do I need to switch ?
+          // it remains only one window
+          val tabs = browser.getDriver.getWindowHandles()
+          browser.getDriver.switchTo().window(tabs.iterator().next())
 
-      browser.findFirst("#disconnected").isDisplayed must equalTo(true)
+          browser.findFirst("#disconnected").isDisplayed must equalTo(true)
     })}}
 
 
     examplesBlock {
-      for (d <- driver("4")) {
-    "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(d) {
+      for (d <- drivers) {
+        "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(d(s)) {
 
-      browser.goTo("http://localhost:" + port)
+          browser.goTo("http://localhost:" + port)
 
-      browser.pageSource must contain("Awale")
+          browser.pageSource must contain("Awale")
 
-      browser.click("#click")
+          browser.click("#click")
 
-      browser.pageSource must contain("To invite")
+          browser.pageSource must contain("To invite")
 
-      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
-      browser.findFirst("#invitation").isDisplayed must equalTo(true)
-      browser.findFirst("#game").isDisplayed must equalTo(false)
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+          browser.findFirst("#invitation").isDisplayed must equalTo(true)
+          browser.findFirst("#game").isDisplayed must equalTo(false)
 
-      val joinUrl = browser.$("#join-url").getValue
+          val joinUrl = browser.$("#join-url").getValue
+    
+          browser.goToInNewTab(joinUrl)
 
-      browser.goToInNewTab(joinUrl)
+          browser.findFirst("#invitation").isDisplayed must equalTo(false)
+          browser.findFirst("#game").isDisplayed must equalTo(true)
 
-      browser.findFirst("#invitation").isDisplayed must equalTo(false)
-      browser.findFirst("#game").isDisplayed must equalTo(true)
+          browser.firstTab()
 
-      browser.firstTab()
+          browser.findFirst("#invitation").isDisplayed must equalTo(false)
+          browser.findFirst("#game").isDisplayed must equalTo(true)
 
-      browser.findFirst("#invitation").isDisplayed must equalTo(false)
-      browser.findFirst("#game").isDisplayed must equalTo(true)
-
-      browser.find(".col").get(6).click()
-      browser.await().atMost(5, TimeUnit.SECONDS).until("#passive").areDisplayed()
-      browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
+          browser.find(".col").get(6).click()
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#passive").areDisplayed()
+          browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
     })}}
 
 
@@ -169,19 +169,20 @@ object FluentExtensions {
 }
 
 trait EnvAwareDriver {
-  def driver(name: String): Seq[WebDriver] = {
+  def drivers: Seq[String => WebDriver] = {
     if (System.getenv("CI") != "true") {
-      List(WebDriverFactory(FIREFOX))
+      List(_ => WebDriverFactory(FIREFOX))
     } else {
       // do not instantiate RemoteWebDriver early, it creates an HTTP conn behind the scene
-      List("36.0", "37.0"/*, "38.0"*/).toStream.map { v =>
-        val caps = DesiredCapabilities.firefox()
-        caps.setCapability("platform", "Windows 7")
-        caps.setCapability("version", v)
-        caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
-        caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
-        caps.setCapability("name", name)
-        new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
+       List("36.0", "37.0"/*, "38.0"*/).map { v =>
+         (name : String) =>
+           val caps = DesiredCapabilities.firefox()
+            caps.setCapability("platform", "Windows 7")
+            caps.setCapability("version", v)
+            caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
+            caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
+            caps.setCapability("name", name)
+            new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
       }
     }
   }
