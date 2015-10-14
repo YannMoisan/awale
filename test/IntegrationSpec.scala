@@ -175,9 +175,9 @@ trait EnvAwareDriver {
   def driver(name: String): Seq[WebDriver] = {
 //    WebDriverFactory(FIREFOX)
     if (System.getenv("CI") != "true") {
-      List(WebDriverFactory(FIREFOX), WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX))
+      List(WebDriverFactory(FIREFOX)/*, WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX)*/)
     } else {
-      List("36.0", "37.0", "38.0").map { v =>
+      List("36.0"/*, "37.0", "38.0"*/).map { v =>
         val caps = DesiredCapabilities.firefox()
         caps.setCapability("platform", "Windows 7")
         caps.setCapability("version", v)
