@@ -7,7 +7,6 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.specs2.specification.{Fragments, Fragment}
 import play.api.test.Helpers._
 import play.api.test._
 
@@ -25,7 +24,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow one user to create a game" in ((s: String) => new WithBrowser(d(s)) {
+        "allow P1 to create a game" in ((s: String) => new WithBrowser(d(s)) {
 
           browser.goTo("http://localhost:" + port)
 
@@ -42,7 +41,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow one user to create a game, and another user to join" in ((s: String) => new WithBrowser(d(s)) {
+        "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowser(d(s)) {
 
           browser.goTo("http://localhost:" + port)
 
@@ -72,7 +71,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow one user to create a game, and another user to join, the first one to disconnect, and the second one to be notified" in ((s: String) => new WithBrowser(d(s)) {
+        "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowser(d(s)) {
 
           browser.goTo("http://localhost:" + port)
 
@@ -112,7 +111,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(d(s)) {
+        "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowser(d(s)) {
 
           browser.goTo("http://localhost:" + port)
 
@@ -127,7 +126,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
           browser.findFirst("#game").isDisplayed must equalTo(false)
 
           val joinUrl = browser.$("#join-url").getValue
-    
+
           browser.goToInNewTab(joinUrl)
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
