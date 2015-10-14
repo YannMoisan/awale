@@ -23,9 +23,9 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
   "Application" should {
 
-//    examplesBlock {
-//      for (d <- driver("1")) {
-        "allow one user to create a game" in ((s: String) => new WithBrowser(driver("11")(0)()) {
+    examplesBlock {
+      for (d <- driver("1")) {
+        "allow one user to create a game" in ((s: String) => new WithBrowser(d) {
 
           browser.goTo("http://localhost:" + port)
 
@@ -38,27 +38,11 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
           browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
           browser.findFirst("#invitation").isDisplayed must equalTo(true)
           browser.findFirst("#game").isDisplayed must equalTo(false)
-    })
-
-    "allow one user to create a game" in ((s: String) => new WithBrowser(driver("12")(1)()) {
-
-      browser.goTo("http://localhost:" + port)
-
-      browser.pageSource must contain("Awale")
-
-      browser.click("#click")
-
-      browser.pageSource must contain("To invite")
-
-      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
-      browser.findFirst("#invitation").isDisplayed must equalTo(true)
-      browser.findFirst("#game").isDisplayed must equalTo(false)
-    })
-  //}}
+    })}}
 
     examplesBlock {
       for (d <- driver("2")) {
-    "allow one user to create a game, and another user to join" in ((s: String) => new WithBrowser(d()) {
+    "allow one user to create a game, and another user to join" in ((s: String) => new WithBrowser(d) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -88,7 +72,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- driver("3")) {
-    "allow one user to create a game, and another user to join, the first one to disconnect, and the second one to be notified" in ((s: String) => new WithBrowser(d()) {
+    "allow one user to create a game, and another user to join, the first one to disconnect, and the second one to be notified" in ((s: String) => new WithBrowser(d) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -128,7 +112,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- driver("4")) {
-    "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(d()) {
+    "allow one user to create a game, and another user to join, and the first one to play the first move" in ((s: String) => new WithBrowser(d) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -185,20 +169,19 @@ object FluentExtensions {
 }
 
 trait EnvAwareDriver {
-  def driver(name: String): Seq[()=>WebDriver] = {
-//    WebDriverFactory(FIREFOX)
+  def driver(name: String): Seq[WebDriver] = {
     if (System.getenv("CI") != "true") {
-      List.fill(1)(()=>WebDriverFactory(FIREFOX))
-      //, WebDriverFactory(FIREFOX)/*,WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX)*/)
+      List(WebDriverFactory(FIREFOX))
     } else {
-      List("36.0", "37.0"/*, "38.0"*/).map { v =>
+      // do not instantiate RemoteWebDriver early, it creates an HTTP conn behind the scene
+      List("36.0", "37.0"/*, "38.0"*/).toStream.map { v =>
         val caps = DesiredCapabilities.firefox()
         caps.setCapability("platform", "Windows 7")
         caps.setCapability("version", v)
         caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
         caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
         caps.setCapability("name", name)
-        () => new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
+        new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
       }
     }
   }
