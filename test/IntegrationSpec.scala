@@ -28,6 +28,9 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
           browser.goTo("http://localhost:" + port)
 
+          println(browser.getCookies.mkString(","))
+          println(browser.getCookies.map{c=>s"${c.getName}:${c.getValue}"}.mkString(","))
+
           browser.pageSource must contain("Awale")
 
           browser.click("#click")
