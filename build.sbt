@@ -15,9 +15,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala).settings(jasmine
     jasmineConfFile <+= baseDirectory / "test/assets/test.dependencies.js",
     // link jasmine to the standard 'sbt test' action. Now when running 'test' jasmine tests will be run, and if they pass
     // then other Play tests will be executed.
-    (test in Test) <<= (test in Test) dependsOn (jasmine),
-    parallelExecution in (Test) := false,
-    testOptions in Test += Tests.Argument("sequential")
+    (test in Test) <<= (test in Test) dependsOn (jasmine)
   )
 
 scalaVersion := "2.11.1"

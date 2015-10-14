@@ -19,9 +19,6 @@ import scala.collection.JavaConversions._
  */
 @RunWith(classOf[JUnitRunner])
 class IntegrationSpec extends Specification with EnvAwareDriver {
-  // Set sequential execution
-  sequential
-
   import FluentExtensions._
 
   "Application" should {
