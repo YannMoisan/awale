@@ -28,7 +28,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
 //    examplesBlock {
 //      for (d <- driver("1")) {
-        "allow one user to create a game" in ((s: String) => new WithBrowser(driver("1")(0)) {
+        "allow one user to create a game" in ((s: String) => new WithBrowser(driver("11")(0)) {
 
           browser.goTo("http://localhost:" + port)
 
@@ -43,7 +43,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
           browser.findFirst("#game").isDisplayed must equalTo(false)
     })
 
-    "allow one user to create a game" in ((s: String) => new WithBrowser(driver("1")(1)) {
+    "allow one user to create a game" in ((s: String) => new WithBrowser(driver("12")(1)) {
 
       browser.goTo("http://localhost:" + port)
 
@@ -191,7 +191,8 @@ trait EnvAwareDriver {
   def driver(name: String): Seq[WebDriver] = {
 //    WebDriverFactory(FIREFOX)
     if (System.getenv("CI") != "true") {
-      List(WebDriverFactory(FIREFOX), WebDriverFactory(FIREFOX)/*,WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX)*/)
+      List.fill(1)(WebDriverFactory(FIREFOX))
+      //, WebDriverFactory(FIREFOX)/*,WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX)*/)
     } else {
       List("36.0", "37.0"/*, "38.0"*/).map { v =>
         val caps = DesiredCapabilities.firefox()
