@@ -168,16 +168,16 @@ object FluentExtensions {
 }
 
 trait EnvAwareDriver {
+  import DesiredCapabilities._
   def drivers: Seq[String => WebDriver] = {
     if (System.getenv("CI") != "true") {
       List(_ => WebDriverFactory(FIREFOX))
     } else {
       // do not instantiate RemoteWebDriver early, it creates an HTTP conn behind the scene
-       List("36.0", "37.0"/*, "38.0"*/).map { v =>
+       List((firefox(), "36.0"), (internetExplorer(), "9.0"), (chrome(), "38.0")).map { case (caps, version) =>
          (name : String) =>
-           val caps = DesiredCapabilities.firefox()
             caps.setCapability("platform", "Windows 7")
-            caps.setCapability("version", v)
+            caps.setCapability("version", version)
             caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
             caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
             caps.setCapability("name", name)
