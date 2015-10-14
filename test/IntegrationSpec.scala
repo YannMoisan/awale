@@ -26,9 +26,9 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
   "Application" should {
 
-    examplesBlock {
-      for (d <- driver("1")) {
-        "allow one user to create a game" in ((s: String) => new WithBrowser(d) {
+//    examplesBlock {
+//      for (d <- driver("1")) {
+        "allow one user to create a game" in ((s: String) => new WithBrowser(driver("1")(0)) {
 
           browser.goTo("http://localhost:" + port)
 
@@ -41,7 +41,23 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
           browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
           browser.findFirst("#invitation").isDisplayed must equalTo(true)
           browser.findFirst("#game").isDisplayed must equalTo(false)
-    })}}
+    })
+
+    "allow one user to create a game" in ((s: String) => new WithBrowser(driver("1")(1)) {
+
+      browser.goTo("http://localhost:" + port)
+
+      browser.pageSource must contain("Awale")
+
+      browser.click("#click")
+
+      browser.pageSource must contain("To invite")
+
+      browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+      browser.findFirst("#invitation").isDisplayed must equalTo(true)
+      browser.findFirst("#game").isDisplayed must equalTo(false)
+    })
+  //}}
 
     examplesBlock {
       for (d <- driver("2")) {
@@ -175,7 +191,7 @@ trait EnvAwareDriver {
   def driver(name: String): Seq[WebDriver] = {
 //    WebDriverFactory(FIREFOX)
     if (System.getenv("CI") != "true") {
-      List(WebDriverFactory(FIREFOX)/*, WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX)*/)
+      List(WebDriverFactory(FIREFOX), WebDriverFactory(FIREFOX)/*,WebDriverFactory(FIREFOX),WebDriverFactory(FIREFOX)*/)
     } else {
       List("36.0", "37.0"/*, "38.0"*/).map { v =>
         val caps = DesiredCapabilities.firefox()
