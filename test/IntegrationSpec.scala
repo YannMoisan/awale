@@ -11,6 +11,7 @@ import play.api.test.Helpers._
 import play.api.test._
 
 import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 /**
  * add your integration spec here.
@@ -26,10 +27,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "allow P1 to create a game" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("http://localhost:" + port)
-
-          println(browser.getCookies.mkString(","))
-          println(browser.getCookies.map{c=>s"${c.getName}:${c.getValue}"}.mkString(","))
+          browser.goTo("/")
 
           browser.pageSource must contain("Awale")
 
@@ -46,7 +44,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("http://localhost:" + port)
+          browser.goTo("/")
 
           browser.pageSource must contain("Awale")
 
@@ -61,12 +59,14 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
           val joinUrl = browser.$("#join-url").getValue
 
-          browser.goToInNewTab(joinUrl)
+          val firstTab = browser.getDriver.getWindowHandle
+
+          browser.goToInNewTab(joinUrl, "P2")
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
 
-          browser.firstTab()
+          browser.switchTo(firstTab)
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
@@ -76,7 +76,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("http://localhost:" + port)
+          browser.goTo("/")
 
           browser.pageSource must contain("Awale")
 
@@ -91,17 +91,18 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
           val joinUrl = browser.$("#join-url").getValue
 
-          browser.goToInNewTab(joinUrl)
+          val firstTab = browser.getDriver.getWindowHandle
+          browser.goToInNewTab(joinUrl, "P2")
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
 
-          browser.firstTab()
+          browser.switchTo(firstTab)
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
 
-          browser.webDriver.close()
+          browser.getDriver.close()
 
           // when I close, do I need to switch ?
           // it remains only one window
@@ -116,7 +117,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("http://localhost:" + port)
+          browser.goTo("/")
 
           browser.pageSource must contain("Awale")
 
@@ -130,12 +131,13 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
           val joinUrl = browser.$("#join-url").getValue
 
-          browser.goToInNewTab(joinUrl)
+          val firstTab = browser.getDriver.getWindowHandle
+          browser.goToInNewTab(joinUrl, "P2")
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
 
-          browser.firstTab()
+          browser.switchTo(firstTab)
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
@@ -149,13 +151,29 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "display the number of connected players" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("http://localhost:" + port)
+          browser.goTo("/")
 
           browser.$("#nb-players").getText must equalTo("1")
 
-          browser.goToInNewTab("http://localhost:" + port)
+          val firstTab = browser.getDriver.getWindowHandle
+          browser.goToInNewTab("/", "P2")
 
           browser.$("#nb-players").getText must equalTo("2")
+
+          browser.goToInNewTab("/", "P3")
+          browser.$("#nb-players").getText must equalTo("3")
+
+          browser.getDriver.close
+
+          browser.getDriver.switchTo().window("P2")
+          browser.$("#nb-players").getText must equalTo("2")
+
+          browser.getDriver.switchTo().window(firstTab)
+          browser.$("#nb-players").getText must equalTo("2")
+
+
+          // browser.getDriver.switchTo().window(firstTab)
+          // browser.firstTab(firstTab, browser.getDriver)
         })}}
 
 
@@ -165,19 +183,15 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 object FluentExtensions {
 
   implicit class EnhancedFluentAdapter(f: Fluent) {
-    def goToInNewTab(url: String): Fluent = {
-      val tabs = f.getDriver.getWindowHandles()
-      f.executeScript(s"window.open('${url}', '_blank');")
-      val tabs2 = f.getDriver.getWindowHandles()
-      tabs2.removeAll(tabs)
-      f.getDriver.switchTo().window(tabs2.iterator.next)
+    val initialHandle = f.getDriver.getWindowHandle
+
+    def goToInNewTab(url: String, windowName: String): Fluent = {
+      f.executeScript(s"window.open('${url}', '${windowName}');")
+      f.getDriver.switchTo().window(windowName)
       f
     }
-    def firstTab() : Fluent = {
-      val currentTab = f.getDriver.getWindowHandle
-      val tabs = f.getDriver.getWindowHandles()
-      tabs.remove(currentTab)
-      f.getDriver.switchTo().window(tabs.iterator().next())
+    def switchTo(windowName: String) : Fluent = {
+      f.getDriver.switchTo().window(windowName)
       f
     }
   }
