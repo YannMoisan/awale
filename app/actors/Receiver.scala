@@ -93,6 +93,7 @@ class GamesActor extends Actor with ActorLogging {
         case _: PreGame => // we can't move a PreGame
       }
     }
+    case AskNbGames => sender() ! ReplyNbGames(nbGames)
   }
 }
 
@@ -148,6 +149,7 @@ case object BroadcastMetrics
 // Out Message
 case class Disconnect(playerId : String)
 case class Stats(nbPlayers: Int, nbGames: Int)
+
 
 // Model
 case class Player(ref: ActorRef, out: ActorRef, playerId: String)

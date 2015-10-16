@@ -14,20 +14,19 @@
       <a href="#" class="pure-menu-heading pure-menu-link">Awale~</a>
       <ul class="pure-menu-list">
         <li class="pure-menu-item"><a href="http://en.wikipedia.org/wiki/Oware#Rules" class="pure-menu-link">Rules</a></li>
+        <li class="pure-menu-item"><a href="https://github.com/YannMoisan/awale" class="pure-menu-link">Source code</a></li>
       </ul>
     </div>
 
     <div class="main">
       <span class="message-error" id="error"></span>
 
-      <div id="start" class="pure-g">
-        <div class="middle pure-u-2-5">
-          <p><span id="nb-players"></span> players</p>
-          <p><span id="nb-games"></span> games in play</p>
-        </div>
-        <div class="middle pure-u-3-5">
+      <div>
+        <p><span id="nb-players"></span> players, <span id="nb-games"></span> games in play</p>
+      </div>
+
+      <div id="start">
           <button id="click" class="pure-button pure-button-primary" onClick="awale.ctrl.doSend('create')">Play with a friend</button>
-        </div>
       </div>
 
       <div id="invitation">
@@ -41,7 +40,7 @@
       </div>
 
       <div id="game">
-        <p class="info">Your score : <span id="score1"></span><span class="time" id="time1"></span></p>
+        <p class="info">Opponent score : <span id="score1"></span><span class="time" id="time1"></span></p>
         <div id="container" class="container">
           <div class="table-row">
             <div id="11" class="col">4</div>

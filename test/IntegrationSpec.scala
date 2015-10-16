@@ -145,6 +145,19 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
           browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
     })}}
 
+    examplesBlock {
+      for (d <- drivers) {
+        "display the number of connected players" in ((s: String) => new WithBrowser(d(s)) {
+
+          browser.goTo("http://localhost:" + port)
+
+          browser.$("#nb-players").getText must equalTo("1")
+
+          browser.goToInNewTab("http://localhost:" + port)
+
+          browser.$("#nb-players").getText must equalTo("2")
+        })}}
+
 
   }
 }
