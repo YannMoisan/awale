@@ -97,6 +97,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
 
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#active").areDisplayed() // tempo for chrome on sauce labs
           browser.find(".col").get(6).click()
           browser.await().atMost(5, TimeUnit.SECONDS).until("#passive").areDisplayed()
           browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
