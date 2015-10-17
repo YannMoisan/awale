@@ -47,11 +47,11 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
         "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowser(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
-          val mainPage = browser.createPage(classOf[MainPage])
+          val page = browser.createPage(classOf[AwaleSinglePage])
 
-          browser.goTo(mainPage)
+          browser.goTo(page)
 
-          browser.goToInNewTab(mainPage.joinUrl, "P2")
+          browser.goToInNewTab(page.joinUrl, "P2")
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
@@ -67,11 +67,11 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
         "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowser(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
-          val mainPage = browser.createPage(classOf[MainPage])
+          val page = browser.createPage(classOf[AwaleSinglePage])
 
-          browser.goTo(mainPage)
+          browser.goTo(page)
 
-          browser.goToInNewTab(mainPage.joinUrl, "P2")
+          browser.goToInNewTab(page.joinUrl, "P2")
 
           browser.switchTo(firstTab)
           browser.getDriver.close()
@@ -86,11 +86,11 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
         "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowser(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
-          val mainPage = browser.createPage(classOf[MainPage])
+          val page = browser.createPage(classOf[AwaleSinglePage])
 
-          browser.goTo(mainPage)
+          browser.goTo(page)
 
-          browser.goToInNewTab(mainPage.joinUrl, "P2")
+          browser.goToInNewTab(page.joinUrl, "P2")
 
           browser.switchTo(firstTab)
 
@@ -107,25 +107,25 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
         "display the number of connected players" in ((s: String) => new WithBrowser(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
-          val mainPage = browser.createPage(classOf[MainPage])
+          val page = browser.createPage(classOf[AwaleSinglePage])
 
-          browser.goTo(mainPage)
-          mainPage.nbPlayers must equalTo("1")
+          page.go()
+          page.checkNbPlayers("1")
 
           browser.goToInNewTab("/", "P2")
-          mainPage.nbPlayers must equalTo("2")
+
+          page.checkNbPlayers("2")
 
           browser.goToInNewTab("/", "P3")
-          mainPage.nbPlayers must equalTo("3")
+          page.checkNbPlayers("3")
 
           browser.getDriver.close
 
           browser.getDriver.switchTo().window("P2")
-          mainPage.nbPlayers must equalTo("2")
+          page.checkNbPlayers("2")
 
           browser.getDriver.switchTo().window(firstTab)
-          mainPage.nbPlayers must equalTo("2")
-
+          page.checkNbPlayers("2")
 
           // browser.getDriver.switchTo().window(firstTab)
           // browser.firstTab(firstTab, browser.getDriver)
@@ -135,10 +135,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
   }
 }
 
-class MainPage extends FluentPage {
-  @FindBy(css = "#nb-players")
-  var nbPlayersElt: FluentWebElement = null
-
+class AwaleSinglePage extends FluentPage {
   var click: FluentWebElement = null
 
   @FindBy(css = "#join-url")
@@ -147,11 +144,12 @@ class MainPage extends FluentPage {
 
   def joinUrl : String = {
     click.click
-    await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+    await().atMost(1, TimeUnit.SECONDS).until("#invitation").areDisplayed()
     joinUrlElt.getValue
   }
 
-  def nbPlayers = nbPlayersElt.getText
+  def checkNbPlayers(nbPlayers: String) = await().atMost(1, TimeUnit.SECONDS).until("#nb-players").hasText(nbPlayers)
+
   override def getUrl = "/"
 }
 
