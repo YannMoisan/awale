@@ -1,10 +1,12 @@
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-import org.fluentlenium.core.Fluent
+import org.fluentlenium.core.domain.FluentWebElement
+import org.fluentlenium.core.{FluentPage, Fluent}
 import org.junit.runner._
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
+import org.openqa.selenium.support.FindBy
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test.Helpers._
@@ -44,24 +46,12 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("/")
-
-          browser.pageSource must contain("Awale")
-
-          browser.click("#click")
-
-          browser.pageSource must contain("To invite")
-
-          browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
-
-          browser.findFirst("#invitation").isDisplayed must equalTo(true)
-          browser.findFirst("#game").isDisplayed must equalTo(false)
-
-          val joinUrl = browser.$("#join-url").getValue
-
           val firstTab = browser.getDriver.getWindowHandle
+          val mainPage = browser.createPage(classOf[MainPage])
 
-          browser.goToInNewTab(joinUrl, "P2")
+          browser.goTo(mainPage)
+
+          browser.goToInNewTab(mainPage.joinUrl, "P2")
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
           browser.findFirst("#game").isDisplayed must equalTo(true)
@@ -76,38 +66,16 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("/")
-
-          browser.pageSource must contain("Awale")
-
-          browser.click("#click")
-
-          browser.pageSource must contain("To invite")
-
-          browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
-
-          browser.findFirst("#invitation").isDisplayed must equalTo(true)
-          browser.findFirst("#game").isDisplayed must equalTo(false)
-
-          val joinUrl = browser.$("#join-url").getValue
-
           val firstTab = browser.getDriver.getWindowHandle
-          browser.goToInNewTab(joinUrl, "P2")
+          val mainPage = browser.createPage(classOf[MainPage])
 
-          browser.findFirst("#invitation").isDisplayed must equalTo(false)
-          browser.findFirst("#game").isDisplayed must equalTo(true)
+          browser.goTo(mainPage)
+
+          browser.goToInNewTab(mainPage.joinUrl, "P2")
 
           browser.switchTo(firstTab)
-
-          browser.findFirst("#invitation").isDisplayed must equalTo(false)
-          browser.findFirst("#game").isDisplayed must equalTo(true)
-
           browser.getDriver.close()
-
-          // when I close, do I need to switch ?
-          // it remains only one window
-          val tabs = browser.getDriver.getWindowHandles()
-          browser.getDriver.switchTo().window(tabs.iterator().next())
+          browser.getDriver.switchTo().window("P2")
 
           browser.findFirst("#disconnected").isDisplayed must equalTo(true)
     })}}
@@ -117,25 +85,12 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("/")
-
-          browser.pageSource must contain("Awale")
-
-          browser.click("#click")
-
-          browser.pageSource must contain("To invite")
-
-          browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
-          browser.findFirst("#invitation").isDisplayed must equalTo(true)
-          browser.findFirst("#game").isDisplayed must equalTo(false)
-
-          val joinUrl = browser.$("#join-url").getValue
-
           val firstTab = browser.getDriver.getWindowHandle
-          browser.goToInNewTab(joinUrl, "P2")
+          val mainPage = browser.createPage(classOf[MainPage])
 
-          browser.findFirst("#invitation").isDisplayed must equalTo(false)
-          browser.findFirst("#game").isDisplayed must equalTo(true)
+          browser.goTo(mainPage)
+
+          browser.goToInNewTab(mainPage.joinUrl, "P2")
 
           browser.switchTo(firstTab)
 
@@ -151,25 +106,25 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
       for (d <- drivers) {
         "display the number of connected players" in ((s: String) => new WithBrowser(d(s)) {
 
-          browser.goTo("/")
-
-          browser.$("#nb-players").getText must equalTo("1")
-
           val firstTab = browser.getDriver.getWindowHandle
-          browser.goToInNewTab("/", "P2")
+          val mainPage = browser.createPage(classOf[MainPage])
 
-          browser.$("#nb-players").getText must equalTo("2")
+          browser.goTo(mainPage)
+          mainPage.nbPlayers must equalTo("1")
+
+          browser.goToInNewTab("/", "P2")
+          mainPage.nbPlayers must equalTo("2")
 
           browser.goToInNewTab("/", "P3")
-          browser.$("#nb-players").getText must equalTo("3")
+          mainPage.nbPlayers must equalTo("3")
 
           browser.getDriver.close
 
           browser.getDriver.switchTo().window("P2")
-          browser.$("#nb-players").getText must equalTo("2")
+          mainPage.nbPlayers must equalTo("2")
 
           browser.getDriver.switchTo().window(firstTab)
-          browser.$("#nb-players").getText must equalTo("2")
+          mainPage.nbPlayers must equalTo("2")
 
 
           // browser.getDriver.switchTo().window(firstTab)
@@ -178,6 +133,26 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
 
   }
+}
+
+class MainPage extends FluentPage {
+  @FindBy(css = "#nb-players")
+  var nbPlayersElt: FluentWebElement = null
+
+  var click: FluentWebElement = null
+
+  @FindBy(css = "#join-url")
+  var joinUrlElt: FluentWebElement = null
+
+
+  def joinUrl : String = {
+    click.click
+    await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+    joinUrlElt.getValue
+  }
+
+  def nbPlayers = nbPlayersElt.getText
+  override def getUrl = "/"
 }
 
 object FluentExtensions {
