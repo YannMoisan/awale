@@ -13,8 +13,8 @@ import org.specs2.runner._
 import play.api.libs.ws._
 import play.api.test.Helpers._
 import play.api.test._
-import play.libs.Json
 import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.libs.json._
 
 import scala.collection.JavaConversions._
 
@@ -215,9 +215,9 @@ abstract class WithBrowser2[WEBDRIVER <: WebDriver](
     maybeSessionId.foreach { sessionId =>
       println(s"sessionId:${sessionId}")
       val holder: WSRequestHolder = WS.url(s"https://saucelabs.com/rest/v1/yamo93/jobs/${sessionId}")
-      //val data = Json.obj("passed" -> r.isSuccess)
-      val data = Json.parse( s"""{"passed": ${result.isSuccess}}""")
-      val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).post(data.asText())
+      val data = Json.obj("passed" -> result.isSuccess)
+      println(s"data:${data}")
+      val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).put(data)
       f.onComplete(t => println(s"Job update result : ${t.map(r => r.body)}"))
     }
     result
