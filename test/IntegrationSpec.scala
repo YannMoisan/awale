@@ -200,21 +200,25 @@ abstract class WithBrowser2[WEBDRIVER <: WebDriver](
                                                     port: Int = Helpers.testServerPort) extends WithBrowser(webDriver, app, port) {
 
   override def around[T: AsResult](t: => T): Result = {
-    try {
-      val r = Helpers.running(TestServer(port, app))(AsResult.effectively(t))
-      if (webDriver.isInstanceOf[RemoteWebDriver]) {
-        val sessionId = webDriver.asInstanceOf[RemoteWebDriver].getSessionId
-        println(s"sessionId:${sessionId}")
-        val holder: WSRequestHolder = WS.url(s"https://saucelabs.com/rest/v1/yamo93/jobs/${sessionId}")
-        //val data = Json.obj("passed" -> r.isSuccess)
-        val data = Json.parse(s"""{"passed": ${r.isSuccess}}""")
-        val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).post(data.asText())
-        f.onComplete(t => println(s"Job update result : ${t.map(r => r.body)}"))
+    val (result, sessionId) = {
+      try {
+        val r = Helpers.running(TestServer(port, app))(AsResult.effectively(t))
+        val session = if (webDriver.isInstanceOf[RemoteWebDriver])
+          Some(webDriver.asInstanceOf[RemoteWebDriver].getSessionId)
+        else
+          None
+        (r, session)
+      } finally {
+        browser.quit()
       }
-      r
-    } finally {
-      browser.quit()
     }
+    println(s"sessionId:${sessionId}")
+    val holder: WSRequestHolder = WS.url(s"https://saucelabs.com/rest/v1/yamo93/jobs/${sessionId}")
+    //val data = Json.obj("passed" -> r.isSuccess)
+    val data = Json.parse(s"""{"passed": ${result.isSuccess}}""")
+    val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).post(data.asText())
+    f.onComplete(t => println(s"Job update result : ${t.map(r => r.body)}"))
+    result
   }
 }
 
