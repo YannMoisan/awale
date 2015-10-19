@@ -210,7 +210,24 @@ abstract class WithBrowser2[WEBDRIVER <: WebDriver](
         else
           None
         (r, session)
-      } finally {
+      } catch {
+        case e: Exception =>
+          val maybeSessionId = if (webDriver.isInstanceOf[RemoteWebDriver])
+            Some(webDriver.asInstanceOf[RemoteWebDriver].getSessionId)
+          else
+            None
+
+          maybeSessionId.foreach { sessionId =>
+            println(s"sessionId:${sessionId}")
+            val holder: WSRequestHolder = WS.url(s"https://saucelabs.com/rest/v1/yamo93/jobs/${sessionId}")
+            val data = Json.obj("passed" -> false)
+            println(s"data:${data}")
+            val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).put(data).map(t => {println(t.body)})
+            Await.result (f, Duration(5, TimeUnit.SECONDS))
+          }
+          throw e
+      }
+      finally {
         browser.quit()
       }
     }
