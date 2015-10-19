@@ -2,18 +2,20 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 
 import org.fluentlenium.core.domain.FluentWebElement
-import org.fluentlenium.core.{FluentPage, Fluent}
+import org.fluentlenium.core.{Fluent, FluentPage}
 import org.junit.runner._
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import org.openqa.selenium.support.FindBy
+import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable._
 import org.specs2.runner._
+import play.api.libs.ws._
 import play.api.test.Helpers._
 import play.api.test._
+import play.libs.Json
 
 import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
 
 /**
  * add your integration spec here.
@@ -27,7 +29,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow P1 to create a game" in ((s: String) => new WithBrowser(d(s)) {
+        "allow P1 to create a game" in ((s: String) => new WithBrowser2(d(s)) {
 
           browser.goTo("/")
 
@@ -44,7 +46,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowser(d(s)) {
+        "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowser2(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
           val page = browser.createPage(classOf[AwaleSinglePage])
@@ -64,7 +66,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowser(d(s)) {
+        "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowser2(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
           val page = browser.createPage(classOf[AwaleSinglePage])
@@ -83,7 +85,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowser(d(s)) {
+        "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowser2(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
           val page = browser.createPage(classOf[AwaleSinglePage])
@@ -105,7 +107,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "display the number of connected players" in ((s: String) => new WithBrowser(d(s)) {
+        "display the number of connected players" in ((s: String) => new WithBrowser2(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
           val page = browser.createPage(classOf[AwaleSinglePage])
@@ -190,3 +192,26 @@ trait EnvAwareDriver {
     }
   }
 }
+
+abstract class WithBrowser2[WEBDRIVER <: WebDriver](
+                                                    webDriver: WebDriver = WebDriverFactory(Helpers.HTMLUNIT),
+                                                    app: FakeApplication = FakeApplication(),
+                                                    port: Int = Helpers.testServerPort) extends WithBrowser(webDriver, app, port) {
+
+  override def around[T: AsResult](t: => T): Result = {
+    try {
+      val r = Helpers.running(TestServer(port, app))(AsResult.effectively(t))
+      if (webDriver.isInstanceOf[RemoteWebDriver]) {
+        val sessionId = webDriver.asInstanceOf[RemoteWebDriver].getSessionId
+        val holder: WSRequestHolder = WS.url(s"https://saucelabs.com/rest/v1/yamo93/jobs/${sessionId}")
+        //val data = Json.obj("passed" -> r.isSuccess)
+        val data = Json.parse(s"""{"passed": ${r.isSuccess}}""")
+        holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).post(data.asText())
+      }
+      r
+    } finally {
+      browser.quit()
+    }
+  }
+}
+
