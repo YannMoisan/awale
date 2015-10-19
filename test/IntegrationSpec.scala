@@ -209,7 +209,7 @@ abstract class WithBrowser2[WEBDRIVER <: WebDriver](
         //val data = Json.obj("passed" -> r.isSuccess)
         val data = Json.parse(s"""{"passed": ${r.isSuccess}}""")
         val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).post(data.asText())
-        f.onComplete(t => println(s"Job update result : ${t}"))
+        f.onComplete(t => println(s"Job update result : ${t.map(r => r.body)}"))
       }
       r
     } finally {
