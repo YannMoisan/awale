@@ -11,6 +11,8 @@ The geek corner
 ---------------
 Travis : [![Build Status](https://travis-ci.org/YannMoisan/awale.svg?branch=master)](https://travis-ci.org/YannMoisan/awale) / Sauce Labs : [![Sauce Test Status](https://saucelabs.com/buildstatus/yamo93)](https://saucelabs.com/u/yamo93)
 
+Browser Matrix : [![Sauce Test Status](https://saucelabs.com/browser-matrix/yamo93.svg)](https://saucelabs.com/u/yamo93)
+
 After each `git push`, unit tests are executed on [Travis CI](https://travis-ci.org/YannMoisan/awale), then functional tests are executed on SauceLabs. If nothing bad happens, it's deployed on a staging env on [Heroku](http://awale.herokuapp.com/).
 
 Credits
