@@ -183,7 +183,7 @@ trait EnvAwareDriver {
       List(_ => WebDriverFactory(FIREFOX))
     } else {
       // do not instantiate RemoteWebDriver early, it creates an HTTP conn behind the scene
-       List((firefox(), "40.0"), (chrome(), "45.0"), (firefox(), "39.0")).map { case (caps, version) =>
+       List((firefox(), "40.0"), (firefox(), "38.0"), (firefox(), "39.0")).map { case (caps, version) =>
          (name : String) =>
             caps.setCapability("platform", "Windows 7")
             caps.setCapability("version", version)
