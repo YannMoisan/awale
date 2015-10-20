@@ -5,7 +5,8 @@ import org.fluentlenium.core.domain.FluentWebElement
 import org.fluentlenium.core.{Fluent, FluentPage}
 import org.junit.runner._
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
+import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.remote.{SessionId, DesiredCapabilities, RemoteWebDriver}
 import org.openqa.selenium.support.FindBy
 import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable._
@@ -32,7 +33,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow P1 to create a game" in ((s: String) => new WithBrowser2(d(s)) {
+        "allow P1 to create a game" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
 
           browser.goTo("/")
 
@@ -49,7 +50,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowser2(d(s)) {
+        "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
           val page = browser.createPage(classOf[AwaleSinglePage])
@@ -69,7 +70,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowser2(d(s)) {
+        "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
           val page = browser.createPage(classOf[AwaleSinglePage])
@@ -88,7 +89,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowser2(d(s)) {
+        "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
           val page = browser.createPage(classOf[AwaleSinglePage])
@@ -110,7 +111,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
     examplesBlock {
       for (d <- drivers) {
-        "display the number of connected players" in ((s: String) => new WithBrowser2(d(s)) {
+        "display the number of connected players" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
 
           val firstTab = browser.getDriver.getWindowHandle
           val page = browser.createPage(classOf[AwaleSinglePage])
@@ -162,7 +163,6 @@ class AwaleSinglePage extends FluentPage {
 object FluentExtensions {
 
   implicit class EnhancedFluentAdapter(f: Fluent) {
-    val initialHandle = f.getDriver.getWindowHandle
 
     def goToInNewTab(url: String, windowName: String): Fluent = {
       f.executeScript(s"window.open('${url}', '${windowName}');")
@@ -176,10 +176,17 @@ object FluentExtensions {
   }
 }
 
+//      val chromeOptions = new ChromeOptions()
+//      chromeOptions.addArguments("start-maximized")
+//      val capabilities = DesiredCapabilities.chrome();
+//      capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+//      List(_ => new RemoteWebDriver(new URL("http://localhost:9515"), capabilities))
+
 trait EnvAwareDriver {
   import DesiredCapabilities._
   def drivers: Seq[String => WebDriver] = {
     if (System.getenv("CI") != "true") {
+
       List(_ => WebDriverFactory(FIREFOX))
     } else {
       // do not instantiate RemoteWebDriver early, it creates an HTTP conn behind the scene
@@ -196,50 +203,35 @@ trait EnvAwareDriver {
   }
 }
 
-abstract class WithBrowser2[WEBDRIVER <: WebDriver](
+abstract class WithBrowserAndSauceLabsUpdater[WEBDRIVER <: WebDriver](
                                                     webDriver: WebDriver = WebDriverFactory(Helpers.HTMLUNIT),
                                                     app: FakeApplication = FakeApplication(),
                                                     port: Int = Helpers.testServerPort) extends WithBrowser(webDriver, app, port) {
 
-  override def around[T: AsResult](t: => T): Result = {
-    val (result, maybeSessionId) = {
-      try {
-        val r = Helpers.running(TestServer(port, app))(AsResult.effectively(t))
-        val session = if (webDriver.isInstanceOf[RemoteWebDriver])
-          Some(webDriver.asInstanceOf[RemoteWebDriver].getSessionId)
-        else
-          None
-        (r, session)
-      } catch {
-        case e: Exception =>
-          val maybeSessionId = if (webDriver.isInstanceOf[RemoteWebDriver])
-            Some(webDriver.asInstanceOf[RemoteWebDriver].getSessionId)
-          else
-            None
+  // call synchronously the Sauce Labs REST API
+  def updateJob(sessionId: SessionId, passed: Boolean) = {
+    val holder: WSRequestHolder = WS.url(s"https://saucelabs.com/rest/v1/yamo93/jobs/${sessionId}")
+    val data = Json.obj("passed" -> passed)
+    val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).put(data).map(t => {println(t.body)})
+    Await.result (f, Duration(5, TimeUnit.SECONDS))
+  }
 
-          maybeSessionId.foreach { sessionId =>
-            println(s"sessionId:${sessionId}")
-            val holder: WSRequestHolder = WS.url(s"https://saucelabs.com/rest/v1/yamo93/jobs/${sessionId}")
-            val data = Json.obj("passed" -> false)
-            println(s"data:${data}")
-            val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).put(data).map(t => {println(t.body)})
-            Await.result (f, Duration(5, TimeUnit.SECONDS))
-          }
-          throw e
-      }
-      finally {
-        browser.quit()
-      }
+  def getSessionId() : Option[SessionId] = {
+    if (webDriver.isInstanceOf[RemoteWebDriver])
+      Some(webDriver.asInstanceOf[RemoteWebDriver].getSessionId)
+    else
+      None
+  }
+
+  override def around[T: AsResult](t: => T): Result = {
+    var maybeResult : Option[Result] = None
+    val maybeSessionId = getSessionId()  // call before browser.quit() in super.around
+    try {
+      maybeResult = Some(super.around(t))
+      maybeResult.get
     }
-    maybeSessionId.foreach { sessionId =>
-      println(s"sessionId:${sessionId}")
-      val holder: WSRequestHolder = WS.url(s"https://saucelabs.com/rest/v1/yamo93/jobs/${sessionId}")
-      val data = Json.obj("passed" -> result.isSuccess)
-      println(s"data:${data}")
-      val f = holder.withAuth("yamo93", "c1783a7f-802a-41b5-af11-6c6d1841851e", WSAuthScheme.BASIC).put(data).map(t => {println(t.body)})
-      Await.result (f, Duration(5, TimeUnit.SECONDS))
+    finally {
+      maybeSessionId.foreach { updateJob(_, maybeResult.map(_.isSuccess).getOrElse(false)) }
     }
-    result
   }
 }
-
