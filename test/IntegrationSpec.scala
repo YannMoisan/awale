@@ -68,6 +68,9 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
 
         browser.goToInNewTab(page.joinUrl, "P2")
 
+        // wait for game begining before closing tabs
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#game").areDisplayed() // tempo for chrome on sauce labs
+
         browser.switchTo(firstTab)
         browser.getDriver.close()
         browser.getDriver.switchTo().window("P2")
