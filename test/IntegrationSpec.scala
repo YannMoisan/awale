@@ -32,7 +32,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
 
         browser.pageSource must contain("To invite")
 
-        browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#invitation").areDisplayed()
         browser.findFirst("#invitation").isDisplayed must equalTo(true)
         browser.findFirst("#game").isDisplayed must equalTo(false)
       })
@@ -49,7 +49,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
         browser.goToInNewTab(page.joinUrl, "P2")
 
         browser.findFirst("#invitation").isDisplayed must equalTo(false)
-        browser.await().atMost(5, TimeUnit.SECONDS).until("#game").areDisplayed() // tempo for chrome on sauce labs
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#game").areDisplayed() // tempo for chrome on sauce labs
 
         browser.switchTo(firstTab)
 
@@ -72,7 +72,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
         browser.getDriver.close()
         browser.getDriver.switchTo().window("P2")
 
-        browser.await().atMost(10, TimeUnit.SECONDS).until("#disconnected").areDisplayed() // tempo for chrome on sauce labs
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#disconnected").areDisplayed() // tempo for chrome on sauce labs
       })
     }
 
@@ -89,12 +89,12 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
 
         browser.switchTo(firstTab)
 
-        browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areNotDisplayed() // tempo for chrome on sauce labs
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#invitation").areNotDisplayed() // tempo for chrome on sauce labs
         browser.findFirst("#game").isDisplayed must equalTo(true)
 
-        browser.await().atMost(5, TimeUnit.SECONDS).until("#active").areDisplayed() // tempo for chrome on sauce labs
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#active").areDisplayed() // tempo for chrome on sauce labs
         browser.find(".col").get(6).click()
-        browser.await().atMost(5, TimeUnit.SECONDS).until("#passive").areDisplayed()
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#passive").areDisplayed()
         browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
       })
     }
@@ -142,11 +142,11 @@ class AwaleSinglePage extends FluentPage {
 
   def joinUrl : String = {
     click.click
-    await().atMost(10, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+    await().atMost(30, TimeUnit.SECONDS).until("#invitation").areDisplayed()
     joinUrlElt.getValue
   }
 
-  def checkNbPlayers(nbPlayers: String) = await().atMost(1, TimeUnit.SECONDS).until("#nb-players").hasText(nbPlayers)
+  def checkNbPlayers(nbPlayers: String) = await().atMost(30, TimeUnit.SECONDS).until("#nb-players").hasText(nbPlayers)
 
   override def getUrl = "/"
 }
