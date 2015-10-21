@@ -1,11 +1,11 @@
 language: scala
 scala:
 - 2.11.1
-jdk:
-- oraclejdk8
-script:
-- cd $TRAVIS_BUILD_DIR
-- sbt ++$TRAVIS_SCALA_VERSION test
+#jdk:
+#- oraclejdk8
+#script:
+#- cd $TRAVIS_BUILD_DIR
+#- sbt ++$TRAVIS_SCALA_VERSION test
 env:
   global:
   - secure: wvrLgx0Ohx6YWmED5hkXi3l17LCZF1Zi6G8eD0zbP3zBE+Szj1ynvsOXHddP4eq99mpN7Yrp1GHVR2LjOUo5fSldXbDwCLxSZHzSO42xiOqaaRypvitCPcM85o+Q0vFe981BADfWFtarlQ4aVwmy1PWkBdv/fJTf81P/hBq1/m6OsLuPMqrUSgpA1WwsHb44Ao7kbbQt+NWoKLRX3Fvf9rUnVG6HTln/xOCffs3bqvt+0YPt6O30eTogUv5c5NiGi+016cy3Vd+WHrr+dx6NNfrNi4g5o1CYZ1pNE1YK53HFk64BYPP04zfKOn2ftRxk7DjNt1xR0xsBBVU7p06ZqJdm3uZ6VT7cidG8PR3ar++fPXjByHWO3y/jIlRNRmZK6Y6p3iUEIuW168lCanAdGtwBDQNsIkUkvZoDF57D8un9rDdCgHvCdtleQZmt7ZwqqQNSdfA5IzH9aNLUcHaUX7qk1Y4HXgVGiZTtlEpRjScV3VP0fSb68aGmOI8ePEHO3LW7t3U4hc0GUhZBYsO57DNmFe2XDO2PwcZcrLOBY+UIv3twr4oLUx1gbUezfGGqFEMy/xEL2KV2Qu4KbUWE+n7+HKHh8uzeL7St7OEnlRVaxAcvtznfa7QK0dXQEQb50tfKFy/89gU/qirdxnP6FlatSErO3/Hsq5/D+Hg4RLs=
