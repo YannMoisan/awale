@@ -5,6 +5,7 @@ import org.fluentlenium.core.Fluent
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver, SessionId}
 import org.specs2.execute.{AsResult, Result}
+import org.specs2.mutable.Specification
 import play.api.libs.json.Json
 import play.api.libs.ws.{WS, WSAuthScheme, WSRequestHolder}
 import play.api.test.Helpers._
@@ -33,29 +34,47 @@ object FluentExtensions {
   }
 }
 
-//      val chromeOptions = new ChromeOptions()
-//      chromeOptions.addArguments("start-maximized")
-//      val capabilities = DesiredCapabilities.chrome();
-//      capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-//      List(_ => new RemoteWebDriver(new URL("http://localhost:9515"), capabilities))
+trait MultiBrowser {
+  self : Specification =>
+
+  def drivers : Seq[String => WebDriver]
+
+  def browsers(u: (String => WebDriver) => Unit) = examplesBlock {
+    for (driver <- drivers) {
+      u(driver)
+    }
+  }
+}
 
 trait EnvAwareDriver {
-  import DesiredCapabilities._
-  def drivers: Seq[String => WebDriver] = {
-    if (System.getenv("CI") != "true") {
+  def localDrivers: Seq[String => WebDriver]
+  def remoteDrivers: Seq[String => WebDriver]
 
-      List(_ => WebDriverFactory(FIREFOX))
-    } else {
-      // do not instantiate RemoteWebDriver early, it creates an HTTP conn behind the scene
-      List((firefox(), "40.0"), (firefox(), "38.0"), (firefox(), "39.0")).map { case (caps, version) =>
-        (name : String) =>
-          caps.setCapability("platform", "Windows 7")
-          caps.setCapability("version", version)
-          caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
-          caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
-          caps.setCapability("name", name)
-          new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
-      }
+  def drivers: Seq[String => WebDriver] = if (System.getenv("CI") != "true") localDrivers else remoteDrivers
+}
+
+trait Drivers {
+  def localDrivers: Seq[String => WebDriver] = List(_ => WebDriverFactory(FIREFOX))
+  def remoteDrivers: Seq[String => WebDriver] = {
+    import DesiredCapabilities._
+    import SauceLabs._
+    List((firefox(), "40.0"), (firefox(), "38.0"), (firefox(), "39.0")).map { case (caps, version) =>
+      (name: String) =>
+        caps.setCapability("platform", "Windows 7")
+        caps.setCapability("version", version)
+        caps.setSauceLabs(name)
+        new RemoteWebDriver(new URL("http://yamo93:c1783a7f-802a-41b5-af11-6c6d1841851e@ondemand.saucelabs.com:80/wd/hub"), caps)
+
+    }
+  }
+}
+
+object SauceLabs {
+  implicit class SauceLabsCapabilities(caps: DesiredCapabilities) {
+    def setSauceLabs(name: String) = {
+      caps.setCapability("tunnelIdentifier", System.getenv("TRAVIS_JOB_NUMBER"))
+      caps.setCapability("build", System.getenv("TRAVIS_BUILD_NUMBER"))
+      caps.setCapability("name", name)
     }
   }
 }
@@ -73,11 +92,9 @@ abstract class WithBrowserAndSauceLabsUpdater[WEBDRIVER <: WebDriver](
     Await.result (f, Duration(5, TimeUnit.SECONDS))
   }
 
-  def getSessionId() : Option[SessionId] = {
-    if (webDriver.isInstanceOf[RemoteWebDriver])
-      Some(webDriver.asInstanceOf[RemoteWebDriver].getSessionId)
-    else
-      None
+  def getSessionId() : Option[SessionId] = webDriver match {
+    case remote : RemoteWebDriver => Some(remote.getSessionId)
+    case _ => None
   }
 
   override def around[T: AsResult](t: => T): Result = {
