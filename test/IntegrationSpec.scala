@@ -142,7 +142,7 @@ class AwaleSinglePage extends FluentPage {
 
   def joinUrl : String = {
     click.click
-    await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+    await().atMost(10, TimeUnit.SECONDS).until("#invitation").areDisplayed()
     joinUrlElt.getValue
   }
 
