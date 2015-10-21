@@ -71,7 +71,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
           browser.getDriver.close()
           browser.getDriver.switchTo().window("P2")
 
-          browser.findFirst("#disconnected").isDisplayed must equalTo(true)
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#disconnected").areDisplayed() // tempo for chrome on sauce labs
     })}}
 
 
@@ -139,7 +139,7 @@ class AwaleSinglePage extends FluentPage {
 
   def joinUrl : String = {
     click.click
-    await().atMost(1, TimeUnit.SECONDS).until("#invitation").areDisplayed()
+    await().atMost(5, TimeUnit.SECONDS).until("#invitation").areDisplayed()
     joinUrlElt.getValue
   }
 
