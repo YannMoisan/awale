@@ -48,7 +48,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
           browser.goToInNewTab(page.joinUrl, "P2")
 
           browser.findFirst("#invitation").isDisplayed must equalTo(false)
-          browser.findFirst("#game").isDisplayed must equalTo(true)
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#game").areDisplayed() // tempo for chrome on sauce labs
 
           browser.switchTo(firstTab)
 
@@ -88,7 +88,7 @@ class IntegrationSpec extends Specification with EnvAwareDriver {
 
           browser.switchTo(firstTab)
 
-          browser.findFirst("#invitation").isDisplayed must equalTo(false)
+          browser.await().atMost(5, TimeUnit.SECONDS).until("#invitation").areNotDisplayed() // tempo for chrome on sauce labs
           browser.findFirst("#game").isDisplayed must equalTo(true)
 
           browser.await().atMost(5, TimeUnit.SECONDS).until("#active").areDisplayed() // tempo for chrome on sauce labs
