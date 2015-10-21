@@ -72,7 +72,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
         browser.getDriver.close()
         browser.getDriver.switchTo().window("P2")
 
-        browser.await().atMost(5, TimeUnit.SECONDS).until("#disconnected").areDisplayed() // tempo for chrome on sauce labs
+        browser.await().atMost(10, TimeUnit.SECONDS).until("#disconnected").areDisplayed() // tempo for chrome on sauce labs
       })
     }
 
