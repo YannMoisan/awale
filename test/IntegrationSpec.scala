@@ -102,6 +102,51 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
       })
     }
 
+    browsers { d =>
+      "allow a player to capture" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+
+        val firstTab = browser.getDriver.getWindowHandle
+        val page = browser.createPage(classOf[AwaleSinglePage])
+
+        browser.goTo(page)
+
+        browser.goToInNewTab(page.joinUrl, "P2")
+
+        browser.switchTo(firstTab)
+
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#invitation").areNotDisplayed() // tempo for chrome on sauce labs
+        browser.findFirst("#game").isDisplayed must equalTo(true)
+
+        // Play 3 (9)
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#active").areDisplayed() // tempo for chrome on sauce labs
+        browser.find(".col").get(9).click()
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#passive").areDisplayed()
+        //browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
+        browser.switchTo("P2")
+
+        // Play 11 (11)
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#active").areDisplayed() // tempo for chrome on sauce labs
+        browser.find(".col").get(11).click()
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#passive").areDisplayed()
+        //browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
+        browser.switchTo(firstTab)
+
+        // Play 5 (11)
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#active").areDisplayed() // tempo for chrome on sauce labs
+        browser.find(".col").get(11).click()
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#passive").areDisplayed()
+        //browser.find(".col").getTexts.toList must equalTo(Seq("4","4","4","4","4","4","0","5","5","5","5","4"))
+        browser.switchTo("P2")
+
+        // Play 7 (10)
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#active").areDisplayed() // tempo for chrome on sauce labs
+        browser.find(".col").get(10).click()
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#passive").areDisplayed()
+        browser.find(".col").getTexts.toList must equalTo(Seq("0","5","0","6","6","6","6","6","5","5","0","1"))
+        browser.find("#score1").getText must equalTo("2")
+        browser.find("#score0").getText must equalTo("0")
+      })
+    }
 
     browsers { d =>
       "display the number of connected players" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
