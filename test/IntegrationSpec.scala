@@ -132,6 +132,26 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
       })
     }
 
+    browsers { d =>
+      "should prevent a third player to join a game"  in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+        val firstTab = browser.getDriver.getWindowHandle
+        val page = browser.createPage(classOf[AwaleSinglePage])
+
+        browser.goTo(page)
+
+        val joinUrl = page.joinUrl
+
+        browser.goToInNewTab(joinUrl, "P2")
+
+        browser.goToInNewTab(joinUrl, "P3")
+
+        browser.await().atMost(30, TimeUnit.SECONDS).until("#error").areDisplayed()
+      })
+
+
+
+    }
+
 
   }
 }
