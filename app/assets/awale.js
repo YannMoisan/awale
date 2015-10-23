@@ -9,6 +9,13 @@
 //var transitionEvent = whichTransitionEvent();
 
 awale.view = {
+    display: function(selector, cond) {
+        document.querySelector(selector).style.display = cond ? "block" : "none";
+    },
+    text: function(selector, value) {
+        if (value !== undefined)
+            document.querySelector(selector).innerHTML = value;
+    },
     formatTime: function(nbSeconds) {
       var min = Math.floor(nbSeconds/60);
       var sec = nbSeconds % 60;
@@ -17,42 +24,29 @@ awale.view = {
       return formattedMin + ":" + formattedSec;
     },
     refresh: function () {
-        if (awale.metrics) {
-            document.getElementById("nb-players").innerHTML = awale.metrics.nbPlayers;
-            document.getElementById("nb-games").innerHTML = awale.metrics.nbGames;
-        }
-        if (awale.status === "begin") {
-            document.getElementById("start").style.display = 'block';
-            document.getElementById("invitation").style.display = 'none';
-            document.getElementById("game").style.display = 'none';
-            document.getElementById("disconnected").style.display = 'none';
+        this.text("#nb-players", awale.metrics && awale.metrics.nbPlayers);
+        this.text("#nb-games",   awale.metrics && awale.metrics.nbGames);
 
-        } else if (awale.status === "await") {
-            document.getElementById("start").style.display = 'none';
-            document.getElementById("invitation").style.display = 'block';
-            document.getElementById("game").style.display = 'none';
-            document.getElementById("disconnected").style.display = 'none';
+        this.display("#start", awale.status === "begin");
+        this.display("#invitation", awale.status === "await");
+        this.display("#game", awale.status === "started" || awale.status === "disconnected");
+        this.display("#disconnected", awale.status === "disconnected");
+        this.display("#error", awale.error);
 
-            document.getElementById("join-url").value = "http://" + document.location.host + "/game/" + awale.gameId;
-        } else if (awale.status === "started") {
-            document.getElementById("start").style.display = 'none';
-            document.getElementById("invitation").style.display = 'none';
-            document.getElementById("game").style.display = 'block';
-            document.getElementById("disconnected").style.display = 'none';
+        this.display("#active",  (!awale.game.winner()) && awale.game.curPlayer === awale.playerId);
+        this.display("#passive", (!awale.game.winner()) && awale.game.curPlayer !== awale.playerId);
 
-            if (awale.time) {
-                document.getElementById("time0").innerHTML = this.formatTime(awale.time.time0);
-                document.getElementById("time1").innerHTML = this.formatTime(awale.time.time1);
-            }
-        } else if (awale.status === "disconnected") {
-            document.getElementById("disconnected").style.display = 'block';
-        }
-        if (awale.error) {
-            document.getElementById("error").style.display = 'block';
-            document.getElementById("error").innerHTML = awale.error;
-        } else {
-            document.getElementById("error").style.display = 'none';
-        }
+        this.text("#time0", awale.time && this.formatTime(awale.time.time0));
+        this.text("#time1", awale.time && this.formatTime(awale.time.time1));
+
+        this.text("#score0", awale.game.scores[0]);
+        this.text("#score1", awale.game.scores[1]);
+
+        this.text("#error", awale.error);
+        this.text("#message", awale.game.winner() && (awale.game.winner() === awale.playerId ? "You Win !" : "You lose !"));
+
+        document.getElementById("join-url").value = "http://" + document.location.host + "/game/" + awale.gameId;
+
         //console.log(this);
         this.houses.forEach(function (i) {
             i.classList.remove("over");
@@ -62,17 +56,7 @@ awale.view = {
             this.houses.forEach(function (element) {
                 element.classList.add("inactive");
             });
-            document.getElementById("active").style.display = 'none';
-            document.getElementById("passive").style.display = 'none';
-            if (awale.game.winner() === awale.playerId) {
-                document.getElementById("message").innerHTML = "You win !";
-            } else {
-                document.getElementById("message").innerHTML = "You lose !";
-            }
         } else {
-            if (awale.game.curPlayer === awale.playerId) {
-                document.getElementById("active").style.display = 'block';
-                document.getElementById("passive").style.display = 'none';
                 //awale.view.intervalID = window.setInterval(function() {
                 //    if (awale.game.curPlayer === 0) {
                 //        awale.time.time0 += 1;
@@ -82,10 +66,6 @@ awale.view = {
                 //        document.getElementById("time1").innerHTML = awale.view.formatTime(awale.time.time0);
                 //    }
                 //}, 1000);
-            } else {
-                document.getElementById("active").style.display = 'none';
-                document.getElementById("passive").style.display = 'block';
-            }
             this.houses.forEach(function (element) {
                 if (awale.game.curPlayer != awale.game.owner(+element.id)) {
                     element.classList.add("inactive");
@@ -95,8 +75,6 @@ awale.view = {
             });
         }
 
-        document.getElementById("score0").innerHTML = awale.game.scores[0];
-        document.getElementById("score1").innerHTML = awale.game.scores[1];
 
         if (awale.game.winner() === undefined) {
             if (awale.game.noMoveLetOpponentPlay()) {
