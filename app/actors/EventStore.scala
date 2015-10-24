@@ -46,9 +46,7 @@ class EventStore extends Actor with ActorLogging {
 
       future.onComplete {
         case Failure(e) => throw e
-        case Success(lastError) => {
-          println("successfully inserted document with lastError = " + lastError)
-        }
+        case Success(lastError) =>
       }
     }
 
@@ -64,9 +62,7 @@ class EventStore extends Actor with ActorLogging {
 
       future.onComplete {
         case Failure(e) => throw e
-        case Success(lastError) => {
-          println("successfully inserted document with lastError = " + lastError)
-        }
+        case Success(lastError) =>
       }
     }
     case Create(gameId, player) => {
@@ -81,9 +77,7 @@ class EventStore extends Actor with ActorLogging {
 
       future.onComplete {
         case Failure(e) => throw e
-        case Success(lastError) => {
-          println("successfully inserted document with lastError = " + lastError)
-        }
+        case Success(lastError) =>
       }
     }
     case Move(gameId, playerId, sowId) => {
@@ -99,9 +93,7 @@ class EventStore extends Actor with ActorLogging {
 
       future.onComplete {
         case Failure(e) => throw e
-        case Success(lastError) => {
-          println("successfully inserted document with lastError = " + lastError)
-        }
+        case Success(lastError) =>
       }
     }
   }

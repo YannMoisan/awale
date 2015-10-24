@@ -4,6 +4,8 @@ import org.fluentlenium.core.FluentPage
 import org.fluentlenium.core.domain.FluentWebElement
 import org.junit.runner._
 import org.openqa.selenium.support.FindBy
+import org.specs2.concurrent.ExecutionEnv
+import org.specs2.main.CommandLine
 import org.specs2.mutable._
 import org.specs2.runner._
 import play.api.test.WithBrowser
@@ -22,7 +24,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
   "Application" should {
 
     browsers { d =>
-      "allow P1 to create a game" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+      "allow P1 to create a game" in (new WithBrowserAndSauceLabsUpdater(d("allow P1 to create a game")) {
 
         browser.goTo("/")
 
@@ -39,7 +41,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
     }
 
     browsers { d =>
-      "allow P1 to create a game, P2 to join" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+      "allow P1 to create a game, P2 to join" in (new WithBrowserAndSauceLabsUpdater(d("allow P1 to create a game, P2 to join")) {
 
         val firstTab = browser.getDriver.getWindowHandle
         val page = browser.createPage(classOf[AwaleSinglePage])
@@ -59,7 +61,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
     }
 
     browsers { d =>
-      "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+      "allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified" in (new WithBrowserAndSauceLabsUpdater(d("allow P1 to create a game, P2 to join, P1 to disconnect, P2 to be notified")) {
 
         val firstTab = browser.getDriver.getWindowHandle
         val page = browser.createPage(classOf[AwaleSinglePage])
@@ -81,7 +83,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
 
 
     browsers { d =>
-      "allow P1 to create a game, P2 to join, P1 to play the first move" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+      "allow P1 to create a game, P2 to join, P1 to play the first move" in (new WithBrowserAndSauceLabsUpdater(d("allow P1 to create a game, P2 to join, P1 to play the first move")) {
 
         val firstTab = browser.getDriver.getWindowHandle
         val page = browser.createPage(classOf[AwaleSinglePage])
@@ -103,7 +105,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
     }
 
     browsers { d =>
-      "allow a player to capture" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+      "allow a player to capture" in (new WithBrowserAndSauceLabsUpdater(d("allow a player to capture")) {
 
         val firstTab = browser.getDriver.getWindowHandle
         val page = browser.createPage(classOf[AwaleSinglePage])
@@ -149,7 +151,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
     }
 
     browsers { d =>
-      "display the number of connected players" in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+      "display the number of connected players" in (new WithBrowserAndSauceLabsUpdater(d("display the number of connected players")) {
 
         val firstTab = browser.getDriver.getWindowHandle
         val page = browser.createPage(classOf[AwaleSinglePage])
@@ -178,7 +180,7 @@ class IntegrationSpec extends Specification with MultiBrowser with EnvAwareDrive
     }
 
     browsers { d =>
-      "should prevent a third player to join a game"  in ((s: String) => new WithBrowserAndSauceLabsUpdater(d(s)) {
+      "should prevent a third player to join a game"  in (new WithBrowserAndSauceLabsUpdater(d("should prevent a third player to join a game")) {
         val firstTab = browser.getDriver.getWindowHandle
         val page = browser.createPage(classOf[AwaleSinglePage])
 

@@ -6,6 +6,7 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver, SessionId}
 import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable.Specification
+import org.specs2.specification.core.Fragment
 import play.api.libs.json.Json
 import play.api.libs.ws.{WS, WSAuthScheme, WSRequestHolder}
 import play.api.test.Helpers._
@@ -39,11 +40,7 @@ trait MultiBrowser {
 
   def drivers : Seq[String => WebDriver]
 
-  def browsers(u: (String => WebDriver) => Unit) = examplesBlock {
-    for (driver <- drivers) {
-      u(driver)
-    }
-  }
+  def browsers(u: (String => WebDriver) => Fragment) = Fragment.foreach(drivers) { driver => u(driver) }
 }
 
 trait EnvAwareDriver {

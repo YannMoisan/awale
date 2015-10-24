@@ -18,21 +18,16 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala).settings(jasmine
     (test in Test) <<= (test in Test) dependsOn (jasmine)
   )
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.7"
 
-libraryDependencies ++= Seq(
-  jdbc,
-  anorm,
-  cache,
-  ws
-)
+libraryDependencies += ws
 
 libraryDependencies += "org.webjars" % "jasmine" % "2.2.0"
 
-libraryDependencies += "org.seleniumhq.selenium" % "selenium-java" % "2.46.0" // % test
+libraryDependencies += "org.seleniumhq.selenium" % "selenium-java" % "2.48.2" // % test
 
-libraryDependencies += "org.reactivemongo" %% "reactivemongo" % "0.10.5.0.akka23"
+libraryDependencies += "org.reactivemongo" %% "reactivemongo" % "0.11.7"
 
-libraryDependencies ++= Seq(
-  ws
-)
+libraryDependencies += specs2 % Test
+
+resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
